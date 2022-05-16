@@ -147,15 +147,7 @@ class Bilder:
             for i in range(len(self.j)):   
                 mp[i] = self.zuschneiden(self.im_dst, self.obj[i])            
             self.mp = mp
-            
-        
-        
-       
-        
-            
-            
-        
-        
+
         self.count += 1 # Nächster Schritt
     
     def getOrientation(self, mu):
