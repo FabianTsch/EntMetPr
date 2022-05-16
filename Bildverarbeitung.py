@@ -42,7 +42,7 @@ class Bilder:
             #cv2.imshow('Maske', self.mask)
             
         else:
-            gray = cv2.cvtColor(b.im_dst, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(self.im_dst, cv2.COLOR_BGR2GRAY)
             self.mask = cv2.inRange(gray, 130, 255)
             self.j = []
             #cv2.imshow('Maske2', self.mask)
