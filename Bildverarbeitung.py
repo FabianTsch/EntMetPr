@@ -42,7 +42,7 @@ class Bilder:
             #cv2.imshow('Maske', self.mask)
             
         else:
-            gray = cv2.cvtColor(b.im_dst, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(self.im_dst, cv2.COLOR_BGR2GRAY)
             self.mask = cv2.inRange(gray, 130, 255)
             self.j = []
             #cv2.imshow('Maske2', self.mask)
@@ -147,15 +147,7 @@ class Bilder:
             for i in range(len(self.j)):   
                 mp[i] = self.zuschneiden(self.im_dst, self.obj[i])            
             self.mp = mp
-            
-        
-        
-       
-        
-            
-            
-        
-        
+
         self.count += 1 # Nächster Schritt
     
     def getOrientation(self, mu):
@@ -201,52 +193,3 @@ class Bilder:
         if self.plot == True:
             cv2.imshow('Bilder_zugeschnitten', image)           
         return image
- 
-    
-              
-            
-        
-# h, status = cv2.findHomography(a, points_dst)        
-# im_dst = cv2.warpPerspective(img, h, (x,y))
-# cv2.imshow('img', im_dst)
-
-#%%
-if __name__=="__main__":
-    cv2.destroyAllWindows()
-
-
-    path = 'Kamerabilder/TX2_SM_kontakt.png'
-    
-    # reading the image
-    img = cv2.imread(path) 
-    
-    b = Bilder(img)
-    b.ausrichten()
-    
-    for i in range(len(b.j)):
-        image = cv2.circle(img, b.mc[i,:], 50, (255, 0, 0), 5)
-        cv2.imshow('img', image)
-    
-
-    cv2.imshow('im_dst', b.im_dst)
-        
-    b.findObjekte()
-    
-    obj = b.obj    
-    a = 10
-    for i in range(len(b.j)):
-        #image = cv2.circle(b.mask, b.mc[i,:], 10, (255, 0, 0), 7)       
-           
-        cv2.rectangle(b.im_dst,(obj[i,0]-a,obj[i,1]-a),(obj[i,0]+obj[i,2]+a,a+obj[i,1]+obj[i,3]),(0,255,0),1)
-        cv2.imshow('im_dst', b.im_dst)
-
-    
-   
-    
-    #wait for a key to be pressed to exit
-    print('Press any key')
-    cv2.waitKey(0)
- 
-    # close the window
-    cv2.destroyAllWindows()
-    
