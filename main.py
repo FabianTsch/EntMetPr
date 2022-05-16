@@ -1,4 +1,4 @@
-from Bildverarbeitung import *
+import Bildverarbeitung as bv
 
 #######################################################################
 #                            Main Programm                            #
@@ -13,9 +13,8 @@ if __name__=="__main__":
     # reading the image
     img = cv2.imread(path) 
     
-    b = Bilder(img)
+    b = bv.Bilder(img)
     b.ausrichten()
-    print(b)
     
     for i in range(len(b.j)):
         image = cv2.circle(img, b.mc[i,:], 50, (255, 0, 0), 5)
