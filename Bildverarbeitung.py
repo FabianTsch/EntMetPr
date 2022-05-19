@@ -9,7 +9,6 @@ Abschlussprojekt
 """
 
 #standard import
-from email.headerregistry import AddressHeader
 import numpy as np
 import matplotlib.pyplot as plt
 from math import pi
@@ -20,31 +19,20 @@ from math import atan2, cos, sin, sqrt, pi
 
 
 class Bilder:  
-    
-    x = 750                                  # Width of the img after homography
-    y = 500                                  # Hight of the img after homography
-    j = np.array([], dtype=int)              # Counturs of interest after Counturs filter
-    count = 0                                # to devide the two mask types (before and after homography)
-    obj = []                                 # np.array([x,y,w,h])  dimensions of the rec_counturs
-    im_dst = 0                               # img after Homography as RGB
+    # Größe des Skalierten Bildes
+    x = 750
+    y = 500      
+    j = np.array([], dtype=int)       
+    count = 0
+    obj = []   
+    im_dst = 0                               # Bild nach der Skalierung
     plot = True                              # Plotten der Schwereachsen
-
 
        
     def __init__(self, img):              
-         self.img = img                     # origin img 
+         self.img = img
          
     def maske(self):
-        """Creats a Mask for the Origin img and for the img after the homography
-            Params
-             --------
-                  plot:   Plots both masks 
-                  count:  to devide the two mask types (before and after homography)
-
-            Returns
-            --------
-                mask:  mask as binary img
-        """
         
         if self.count == 0:
             lower = np.array([40,80,80]) 
@@ -57,32 +45,25 @@ class Bilder:
         else:
             gray = cv2.cvtColor(self.im_dst, cv2.COLOR_BGR2GRAY)
             self.mask = cv2.inRange(gray, 130, 255)
-            self.j = []                    # Clear the storage
+            self.j = []
             if self.plot:
                 cv2.imshow('Maske2', self.mask)
-           
+            
+            
        
-
+    def findObjekte(self):
+        self.maske()
+        self.segmentieren()
       
     
-    def homography(self):    
-
-        """Call  maske() and segmentation(), sort the Points and make the homography
-            Params
-             --------
-                                   
-
-            Returns
-            --------
-                im_dst:  img after homography as RGB
-        """
-        
-        if self.plot:
-            print('aurichten')
+    def ausrichten(self):    
+        print('aurichten')
          
-         # find Objects  
-        self.maske()
-        self.segmentation()
+        self.maske()             
+        
+        # Aufrufen der Segmentierung      
+        
+        self.segmentieren()    
         
         
         # MC sortieren                    
@@ -99,30 +80,24 @@ class Bilder:
               self.mc[2,:] = self.mc[3,:]
               self.mc[3,:] = temp
         
-                        
+        
+                
         # Points in destination image        
         points_dst = np.array([ [self.x, 0], [0, 0],[0, self.y],[self.x, self.y] ])
         
         # Homography
         h, status = cv2.findHomography(self.mc, points_dst)          
         self.im_dst = cv2.warpPerspective(self.img, h, (self.x,self.y))
-        if self.plot:
-            print('Ende erster Durchlauf')
+        print('Ende erster Durchlauf')
     
         
-    def segmentation(self):
-        """Finds the Counturs, center of mass, main direction and Filters Conturs that are not possible 
-            Params
-             --------                                 
-
-            Returns
-            --------
-                
-        """
-
+    def segmentieren(self):
         self.contours, hierarchy = cv2.findContours(self.mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
-                
-        # Counturs Filtern 
+        
+        
+        # Counturs Filtern     
+        
+        
         for i in range(len(self.contours)):       
             area = cv2.contourArea(self.contours[i])
             if area > 150 and self.count == 0:                 
@@ -130,8 +105,8 @@ class Bilder:
             elif area > 100  and self.count > 0:                   # Fläche Überprüfen
                 x,y,w,h = cv2.boundingRect(self.contours[i]) 
                 if 0< x < self.x and 0< y < self.y:                # Position Überprüfen
-                    obj =      np.array([x,y,w,h]) 
-                    self.j =   np.append(self.j,[i] )  
+                    obj = np.array([x,y,w,h]) 
+                    self.j = np.append(self.j,[i] )  
                     self.obj = np.append(self.obj,obj)
 
         self.j = self.j[0:len(self.j)]  
@@ -140,14 +115,18 @@ class Bilder:
         if self.count > 0:
             self.obj = np.resize(self.obj,(len(self.j),4))   
             self.obj = self.obj.astype(int)
-
-
+        
+      
+           
+        
         # Get the moments
         mu = [None]*len(self.j)
         for i in range(len(self.j)):            
             mu[i] = cv2.moments(self.contours[self.j[i]])
+       
+         
 
-
+        
         # Get the mass centers
         mc = [None]*len(self.j)
         for i in range(len(self.j)):           
@@ -168,23 +147,12 @@ class Bilder:
             # Get mini Pictures of each obj            
             mp = [None]*len(self.j)
             for i in range(len(self.j)):   
-                mp[i] = self.cut(self.im_dst, self.obj[i])            
+                mp[i] = self.zuschneiden(self.im_dst, self.obj[i])            
             self.mp = mp
 
         self.count += 1 # Nächster Schritt
     
-
     def getOrientation(self, mu):
-        """Finds the main Orientation of the given Contour
-            Params
-             --------
-             mu:   Moments of the Contour                                 
-
-            Returns
-            --------
-            apha: Main Dircetion of the contour
-                
-        """
     
         
         x = int(mu["m10"] / mu["m00"])
@@ -216,20 +184,8 @@ class Bilder:
         return alpha
         
      
-    def cut(self, img, obj):
-
-        """ Cut the given img around the given objectsize and the center of mass with some overhang
-            Params
-            --------
-             img: picture as RGB  
-             obj: array with the object size [x,y,w,h]                               
-
-            Returns
-            --------
-            image: the cut img with some overhang d
-                
-        """
-        d = 2                        # image overhang
+    def zuschneiden(self, img, obj):
+        d = 2          # Bildüberstand
         x = int(obj[0])
         y = int(obj[1])
         w = int(obj[2])
@@ -239,41 +195,3 @@ class Bilder:
         if self.plot == True:
             cv2.imshow('Bilder_zugeschnitten', image)           
         return image
-
-    def findObject(self):
-
-        """ Makes a mask and find the Object after the Homography 
-            --------                                  
-
-            Returns
-            --------
-                            
-        """
-        self.maske()
-        self.segmentation()
-
-
-    def display_img(self):
-        """ Shows some pictures of the process
-                                    
-        """
-
-
-        if self.plot:     
-                       
-
-            if self.count>0:
-                
-                a = 10
-                for i in range(len(self.j)):
-
-                    cv2.rectangle(
-                        self.im_dst,
-                        (self.obj[i, 0] - a, self.obj[i, 1] - a),
-                        (self.obj[i, 0] + self.obj[i, 2] + a, a + self.obj[i, 1] + self.obj[i, 3]),
-                        (0, 255, 0),
-                        1,
-                    )
-                    cv2.imshow("im_dst mit Schwereachsen", self.im_dst)
-
- 
