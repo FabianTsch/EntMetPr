@@ -16,8 +16,12 @@ import tcp_socket as tcp
 #                            Main Programm                            #
 #######################################################################
 
-camera.execute()
 bv.execute()
+# TODO: path as @para is only a temporary solution as long as the
+#       the camera function isn't implemented.
+img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
+
+
 oc.execute()
 tcp.execute()
 
