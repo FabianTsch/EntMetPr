@@ -277,3 +277,6 @@ class Bilder:
                     cv2.imshow("im_dst mit Schwereachsen", self.im_dst)
 
  
+def execute():
+    # TODO: This is the main function of image processing
+    pass
