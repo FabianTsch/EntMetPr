@@ -26,7 +26,7 @@ class Bilder:
     count = 0
     obj = []   
     im_dst = 0                               # Bild nach der Skalierung
-    plot = False                              # Plotten der Schwereachsen
+    plot = True                              # Plotten der Schwereachsen
 
        
     def __init__(self, img):              
@@ -39,13 +39,15 @@ class Bilder:
             upper = np.array([86,230,230]) 
             hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
             self.mask = cv2.inRange(hsv, lower, upper) 
-            #cv2.imshow('Maske', self.mask)
+            if self.plot:
+                cv2.imshow('Maske', self.mask)
             
         else:
             gray = cv2.cvtColor(self.im_dst, cv2.COLOR_BGR2GRAY)
             self.mask = cv2.inRange(gray, 130, 255)
             self.j = []
-            #cv2.imshow('Maske2', self.mask)
+            if self.plot:
+                cv2.imshow('Maske2', self.mask)
             
             
        
