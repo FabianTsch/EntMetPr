@@ -37,6 +37,8 @@ InteractiveShell.ast_node_interactivity = 'all'
 
 
 
+
+
 #%% Functions
 
 def imshow(image):
@@ -59,18 +61,6 @@ def get_pretrained_model(model_name):
     """
 
     n_classes = 2
-
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()    
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
 
 
     if model_name == 'vgg16':
@@ -97,12 +87,7 @@ def get_pretrained_model(model_name):
             nn.Linear(n_inputs, 256), nn.ReLU(), nn.Dropout(0.2),
             nn.Linear(256, n_classes), nn.LogSoftmax(dim=1))
 
-    # Move to gpu and parallelize
-    if train_on_gpu:
-        model = model.to('cuda')
-
-    if multi_gpu:
-        model = nn.DataParallel(model)
+        
 
     return model
 
@@ -134,18 +119,6 @@ def train(model,
         model (PyTorch model): trained cnn with best weights
         history (DataFrame): history of train and validation loss and accuracy
     """
-
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()    
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
 
     # Early stopping intialization
     epochs_no_improve = 0
@@ -179,10 +152,7 @@ def train(model,
 
         # Training loop
         for ii, (data, target) in enumerate(train_loader):
-            # Tensors to gpu
-            if train_on_gpu:
-                data, target = data.cuda(), target.cuda()
-
+            
             # Clear gradients
             optimizer.zero_grad()
             # Predicted outputs are log probabilities
@@ -222,10 +192,7 @@ def train(model,
 
                 # Validation loop
                 for data, target in valid_loader:
-                    # Tensors to gpu
-                    if train_on_gpu:
-                        data, target = data.cuda(), target.cuda()
-
+                    
                     # Forward pass
                     output = model(data)
 
@@ -328,18 +295,7 @@ def save_checkpoint(model, path):
         None, save the `model` to `path`
 
     """
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()    
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
-
+    
     model_name = path.split('-')[0]
     assert (model_name in ['vgg16', 'resnet50'
                            ]), "Path must have the correct model name"
@@ -354,20 +310,12 @@ def save_checkpoint(model, path):
     # Extract the final classifier and the state dictionary
     if model_name == 'vgg16':
         # Check to see if model was parallelized
-        if multi_gpu:
-            checkpoint['classifier'] = model.module.classifier
-            checkpoint['state_dict'] = model.module.state_dict()
-        else:
-            checkpoint['classifier'] = model.classifier
-            checkpoint['state_dict'] = model.state_dict()
+        checkpoint['classifier'] = model.classifier
+        checkpoint['state_dict'] = model.state_dict()
 
     elif model_name == 'resnet50':
-        if multi_gpu:
-            checkpoint['fc'] = model.module.fc
-            checkpoint['state_dict'] = model.module.state_dict()
-        else:
-            checkpoint['fc'] = model.fc
-            checkpoint['state_dict'] = model.state_dict()
+        checkpoint['fc'] = model.fc
+        checkpoint['state_dict'] = model.state_dict()
 
     # Add the optimizer
     checkpoint['optimizer'] = model.optimizer
@@ -419,25 +367,6 @@ def load_checkpoint(path):
     total_trainable_params = sum(
         p.numel() for p in model.parameters() if p.requires_grad)
     print(f'{total_trainable_params:,} total gradient parameters.')
-
-    
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()    
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
-    # Move to gpu
-    if multi_gpu:
-        model = nn.DataParallel(model)
-
-    if train_on_gpu:
-        model = model.to('cuda')
 
     # Model basics
     model.class_to_idx = checkpoint['class_to_idx']
@@ -519,28 +448,15 @@ def predict(image_path, model, topk=2):
     Returns
 
     """
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()    
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
+      
 
     real_class = image_path.split('/')[-2]
 
     # Convert to pytorch tensor
     img_tensor = process_image(image_path)
 
-    # Resize
-    if train_on_gpu:
-        img_tensor = img_tensor.view(1, 3, 224, 224).cuda()
-    else:
-        img_tensor = img_tensor.view(1, 3, 224, 224)
+    # Resize  
+    img_tensor = img_tensor.view(1, 3, 224, 224)
 
     # Set to evaluation
     with torch.no_grad():
@@ -561,7 +477,6 @@ def predict(image_path, model, topk=2):
         return img_tensor.cpu().squeeze(), top_p, top_classes, real_class
 
 def random_test_image():
-
     datadir = os.path.dirname(os.path.abspath(__file__))+'/Trainingbilder/'
     testdir = datadir + 'Test/'
     
@@ -574,6 +489,8 @@ def random_test_image():
 
 def display_prediction(image_path, model, topk):
     """Display image and preditions from model"""
+    datadir = os.path.dirname(os.path.abspath(__file__))+'/Trainingbilder/'
+    traindir = datadir + 'Training/'
 
     # Get predictions
     img, ps, classes, y_obs = predict(image_path, model, topk)
@@ -618,11 +535,7 @@ def augmentation(model):
             start_index = 0
             # Testing loop
             for ii, (data, targets) in enumerate(test_loader):
-
-                # Tensors to gpu
-                if train_on_gpu:
-                    data, targets = data.to('cuda'), targets.to('cuda')
-
+                
                 # Raw model output
                 out = model(data)
                 out = torch.exp(out)
@@ -639,9 +552,6 @@ def augmentation(model):
 
 def accuracy(output, target, topk=(1, )):
     """Compute the topk accuracy(s)"""
-    if train_on_gpu:
-        output = output.to('cuda')
-        target = target.to('cuda')
 
     with torch.no_grad():
         maxk = max(topk)
@@ -689,10 +599,6 @@ def evaluate(model, test_loader, criterion, topk=(1, 2)):
         # Testing loop
         for data, targets in test_loader:
 
-            # Tensors to gpu
-            if train_on_gpu:
-                data, targets = data.to('cuda'), targets.to('cuda')
-
             # Raw model output
             out = model(data)
             # Iterate through each example
@@ -719,10 +625,11 @@ def evaluate(model, test_loader, criterion, topk=(1, 2)):
 # ****************************************************************************************************************************************************************
 # Zum Trainieren und speichern  eines TLNN, sucht sich eigenständig seine Daten und nimmt als Basis das vgg16 Netzwerk 
 def trainieren_save():    
+    """Train the TransferLearning Network and save it     """
+    
     # Parameters
     trained_model = False
     batch_size = 16
-
 
 
     # Location of data
@@ -736,19 +643,7 @@ def trainieren_save():
 
     # Change to fit hardware
     batch_size = 128
-
-    # Whether to train on a gpu
-    train_on_gpu = cuda.is_available()
-    print(f'Train on gpu: {train_on_gpu}')
-    multi_gpu = False
-    # Number of gpus
-    if train_on_gpu:
-        gpu_count = cuda.device_count()
-        print(f'{gpu_count} gpus detected.')
-        if gpu_count > 1:
-            multi_gpu = True
-        else:
-            multi_gpu = False
+    
 
     # Empty lists
     categories = []
@@ -954,8 +849,9 @@ def trainieren_save():
 
 
 
-
+# ****************************************************************************************************************************************************************
 #%% Main
+# ****************************************************************************************************************************************************************
 trainieren_save()
 
 # ********************************************************************************
