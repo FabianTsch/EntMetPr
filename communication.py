@@ -8,11 +8,12 @@ Communication: Filters the array of object checks for collisions
 """
 
 # %%
+from turtle import width
 import cv2
 import numpy as np
-from PIL import Image 
+from torch import threshold
 
-plot = True
+plot = False
 
 
 
@@ -229,7 +230,175 @@ def checkPick(type, orientation,x,y,angle,orig,img = 0):
             
 
     return j
+
+def nearObj(x,y,x1,y1):
+    """Creats a Group of obj with are neare 
+        Params
+         --------
+        x:             Position from origin in mm - x-Position
+        y:             Position from origin in mm - y-Position   
+        threshold:     the minimal distance between the obj 
+       
+        Returns
+        --------
+        near:          True if the Object is near               
+                
+    """
+    near = False
+    
+    # dim of scew and nut
+    width_s = 50
+    height_s = 20
+    nut = 20
+    
+    # threshold = worst case, screw lies 45° at the center of the nuts edge
+    threshold = ((width_s**2 + height_s**2)**0.5 + nut)/2
+    # amount of the vector
+    distance = ((x-x1)**2+(y-y1)**2)**0.5
+
+    if distance < threshold:
+     near = True
+
+    return near
+
+def createGroup(type, orientation,x,y,angle, area=0):
+    """Creats a Group of obj with are neare
+        Params
+         --------
+        type:          screw = 1, nut = 2, seperate = 3, Done = 0, GoToHome = 10, 
+        orientation:   standing = 1, lying = 2,  perhabs more info    
+        x:             Position from origin in mm - x-Position
+        y:             Position from origin in mm - y-Position
+        angle:         Orientation of the main axis in grad    
+        area:          area of the given objects in mm²   
+       
+        Returns
+        --------
+        g_x:           x Position of the Group in mm from the origin
+        g_y:           y Position of the Group in mm from the origin
+        g_angle:       Orientation of the main axis in grad    
+        g_area:        area of the group in mm²            
+                
+    """
+    g_x = []
+    g_y = []
+    g_angle = [] 
+    g_area = []
+    j = []            # inidizes of whitch obj that are not seperated
+    g_type = np.zeros(np.size(x))     # helpful variable to declare if an obj is part of a Group
+    
+    # Error handling if we get an scalar instead of an list
+    
+    if  np.size(x) == 1:
+        return x, y, angle, area
+     
+    
+    if np.isscalar(area):                         # For the first loop
+        surface = np.ones(np.size(type))   
+        print('Surface',surface) 
+        print('orientation',orientation) 
         
+        for i in range(0,np.size(type)):
+            if type[i] == 1 and orientation[i] == 2:
+                surface[i] = 2
+            elif type[i] == 2 and orientation[i] == 1:
+                surface[i] == 0.5
+    else:
+        surface = area
+    
+
+    # creat group 
+       
+    for i in range(1,np.size(x)):
+        if nearObj(x[i-1], y[i-1], x[i],y[i]) and not g_type[i-1] == 3:
+            # common parameters based on their areas 
+            g_x = np.append(g_x,np.abs((x[i-1]*surface[i-1]+x[i]*surface[i])/(surface[i-1]+surface[i])))
+            g_y = np.append(g_y,np.abs((y[i-1]*surface[i-1]+y[i]*surface[i])/(surface[i-1]+surface[i])))
+            g_angle = np.append(g_angle,np.abs((angle[i-1]*surface[i-1]+angle[i]*surface[i])/(surface[i-1]+surface[i])))
+            g_area = np.append(g_area,surface[i-1]+surface[i] )
+            g_type[i] = 3 
+            g_type[i-1] = 3 
+            print('Objekt erstellen')
+        else:
+            j = np.append(j,int(i))
+               
+    # attach  
+    for i in j:
+        i = int(i)
+        g_x = np.append(g_x, x[i] )  
+        g_y = np.append(g_y, y[i] ) 
+        g_angle = np.append(g_angle, angle[i]) 
+        g_area = np.append(g_area, surface[i])
+
+    
+    
+
+    
+    print('Ende creatGroup')
+    return g_x, g_y, g_angle, g_area
+
+def move(type, orientation,x,y,angle,j):
+    """Creats a Group of obj with are neare
+        Params
+         --------
+        type:          screw = 1, nut = 2, seperate = 3, Done = 0, GoToHome = 10, 
+        orientation:   standing = 1, lying = 2,  perhabs more info    
+        x:             Position from origin in mm - x-Position
+        y:             Position from origin in mm - y-Position
+        angle:         Orientation of the main axis in grad    
+        area:          area of the given objects in mm²   
+       
+        Returns
+        --------
+        m_type:        screw = 1, nut = 2, seperate = 3, Done = 0, GoToHome = 10, 
+        m_orientation: standing = 1, lying = 2,  perhabs more info  
+        m_x:           x Position of the Group in mm from the origin
+        m_y:           y Position of the Group in mm from the origin
+        m_angle:       Orientation of the main axis in grad    
+                
+                
+    """        
+    m_type = []
+    m_orientation = []
+    m_x = []
+    m_y = []
+    m_angle = []
+    
+
+    # creat a list with obj that can not be picked
+    for i in range(0,np.size(type)):
+
+        if not i in j:
+            m_type = np.append(m_type, type[i])
+            m_orientation = np.append(m_orientation, orientation[i])
+            m_x = np.append(m_x, x[i])
+            m_y = np.append(m_y, y[i])
+            m_angle = np.append(m_angle, angle[i])   
+                  
+    
+
+    # first loop
+    m_x, m_y, m_angle, m_area = createGroup(m_type,m_orientation,m_x,m_y,m_angle)    
+    # other loops
+    for i in range(0,np.size(type)):
+        print('####################### Runde :', i)
+        m_x, m_y, m_angle, m_area = createGroup(m_type,m_orientation,m_x,m_y,m_angle,m_area)
+    
+    
+    
+    m_type = np.ones(np.size(m_x)) *3           # set type seperate
+    m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
+    print('Area:', m_area)
+    print('Ende Fkt')
+    return m_type, m_orientation, m_x, m_y, m_angle
+ 
+ 
+    
+
+
+
+    
+
 
 
 # %%
@@ -244,25 +413,35 @@ y = 500
 
 type = [1,1,1,1]
 orientation = [1,2, 1, 2]
-x_obj = [25,200, 150, 180]
-y_obj = [25,200, 250, 200]
+x_obj = [25,200, 180, 180]
+y_obj = [25,200, 190, 200]
 angle = [20,80, 0, 0]
 orig = [x,y]
 
 img = createImg(type, orientation,x_obj,y_obj,angle, orig)
 img_tool =  createImg(type, orientation,x_obj,y_obj,angle, orig, True )
 
+# Scalar
+print(checkPick(1, 1,25,25,20,orig))  
 
-if plot:   
-    # Scalar
-    print(checkPick(1, 1,25,25,20,orig))
-    # Array
-    print('Folgende Indizies sind aufgreifbar: ', checkPick(type, orientation,x_obj,y_obj,angle,orig))
-    
- 
-print(checkPick(type, orientation,x_obj,y_obj,angle,orig))
+# Array
+j = checkPick(type, orientation,x_obj,y_obj,angle,orig)
+print('Folgende Indizies sind aufgreifbar: ', j)
+
+
+
+
 cv2.imshow('Objekt', img+img_tool)
 
-cv2.waitKey()
+m_type, m_orientation, m_x, m_y, m_angle = move(type, orientation,x_obj,y_obj,angle,j)
+
+#cv2.waitKey()
+
+print('Type: ', m_type)
+print(m_orientation)
+print('x: ',m_x)
+print('y: ', m_y)
+print('angle: ', m_angle)
 
 
+# %%
