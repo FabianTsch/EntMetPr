@@ -772,7 +772,7 @@ def trainieren_save():
     print(f'{total_trainable_params:,} training parameters.')
 
     model = get_pretrained_model('vgg16')
-    summary(model, input_size=(3, 224, 224), batch_size=batch_size, device='cuda')
+    # summary(model, input_size=(3, 224, 224), batch_size=batch_size, device='cuda')
 
 
     print(model.classifier[6])
