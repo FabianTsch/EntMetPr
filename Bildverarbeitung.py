@@ -9,10 +9,10 @@ Abschlussprojekt
 """
 
 #standard import
-from email.headerregistry import AddressHeader
+import matplotlib as plt
 import numpy as np
-import matplotlib.pyplot as plt
 from math import pi
+from email.headerregistry import AddressHeader
 
 # Open CV
 import cv2
