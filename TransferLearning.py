@@ -1,20 +1,13 @@
-# Grundstuktur von: https://towardsdatascience.com/transfer-learning-with-convolutional-neural-networks-in-pytorch-dd09190245ce
-#              und https://github.com/WillKoehrsen/pytorch_challenge/blob/master/Setup%20Transfer%20Learning%20in%20PyTorch.ipynb
+#######################################################################
+#                               Imports                               #
+#######################################################################
 
-
-#%%  Drittbibliotheken
-
-from IPython.core.interactiveshell import InteractiveShell
-import seaborn as sns
 # PyTorch
 from torchvision import transforms, datasets, models
 import torch
 from torch import optim, cuda
 from torch.utils.data import DataLoader, sampler
 import torch.nn as nn
-
-import warnings
-warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Data science tools
 import numpy as np
@@ -23,29 +16,20 @@ import os
 
 # Image manipulations
 from PIL import Image
-# Useful for examining network
-from torchsummary import summary
+
 # Timing utility
 from timeit import default_timer as timer
 
 # Visualizations
 import matplotlib.pyplot as plt
-plt.rcParams['font.size'] = 14
-
-# Printing out all outputs
-InteractiveShell.ast_node_interactivity = 'all'
 
 
+# Grundstuktur von: https://towardsdatascience.com/transfer-learning-with-convolutional-neural-networks-in-pytorch-dd09190245ce
+#              und https://github.com/WillKoehrsen/pytorch_challenge/blob/master/Setup%20Transfer%20Learning%20in%20PyTorch.ipynb
 
-
-
-#%% Functions
-
-def imshow(image):
-    plt.figure(figsize = (6, 6))
-    plt.imshow(image)
-    plt.axis('off');
-    plt.show();
+#######################################################################
+#                              Functions                              #
+#######################################################################
 
 def get_pretrained_model(model_name):
     """Retrieve a pre-trained model from torchvision
