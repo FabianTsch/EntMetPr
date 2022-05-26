@@ -363,12 +363,12 @@ def load_checkpoint(path):
 
     return model, optimizer
 
-# ****************************************************************************************************************************************************************
 # Dient zum Evaluierung des Modells --> Funktioniert noch nicht perfekt!
-def process_image(image_path):
+def process_image(image_array):
     """Process an image path into a PyTorch tensor"""
 
-    image = Image.open(image_path)
+    image = Image.fromarray(image_array)
+
     # Resize
     img = image.resize((256, 256))
 
@@ -420,7 +420,7 @@ def imshow_tensor(image, ax=None, title=None):
 
     return ax, image
 
-def predict(image_path, model, topk=2):
+def predict(image_array, model, topk=2):
     """Make a prediction for an image using a trained model
 
     Params
@@ -432,12 +432,9 @@ def predict(image_path, model, topk=2):
     Returns
 
     """
-      
-
-    real_class = image_path.split('/')[-2]
 
     # Convert to pytorch tensor
-    img_tensor = process_image(image_path)
+    img_tensor = process_image(image_array)
 
     # Resize  
     img_tensor = img_tensor.view(1, 3, 224, 224)
@@ -458,7 +455,7 @@ def predict(image_path, model, topk=2):
         ]
         top_p = topk.cpu().numpy()[0]
 
-        return img_tensor.cpu().squeeze(), top_p, top_classes, real_class
+        return img_tensor.cpu().squeeze(), top_p, top_classes
 
 def random_test_image():
     datadir = os.path.dirname(os.path.abspath(__file__))+'/Trainingbilder/'
