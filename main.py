@@ -20,8 +20,8 @@ import tcp_socket as tcp
 #       the camera function isn't implemented.
 img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 
-bv.execute(img)
+img_array = bv.execute(img)
 
-oc.execute()
+obj_class, img_array = oc.execute(img_array)
 
 tcp.execute()
