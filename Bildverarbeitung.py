@@ -280,3 +280,31 @@ class Bilder:
 def execute():
     # TODO: This is the main function of image processing
     pass
+
+def resize(img, size=[244,244], color=[55, 74, 195]):
+    """ resizes image to size and fills up emty space with color
+    Params
+    --------
+    img: picture as RGB
+    size: desired size of the cuttted image
+    color: color to fill up empty space
+
+    Returns
+    --------
+    image: resized image
+    """
+    height, width = img.shape[:2]
+    x_offset = int(size[0]/2)-int(width/2) 
+    y_offset = int(size[1]/2)-int(height/2)
+    size = np.append(size,3) 
+
+    blank_image = np.zeros(size, np.uint8)
+    blank_image[:, :] = color 
+
+    image = blank_image.copy()
+
+    image[y_offset:y_offset+height, x_offset:x_offset+width] = img.copy()
+
+    return image
+
+
