@@ -27,7 +27,7 @@ class Bilder:
     count = 0                                # to devide the two mask types (before and after homography)
     obj = []                                 # np.array([x,y,w,h])  dimensions of the rec_counturs
     im_dst = 0                               # img after Homography as RGB
-    plot = True                              # Plotten der Schwereachsen
+    plot = False                             # Plotten der Schwereachsen
 
 
        
@@ -276,10 +276,6 @@ class Bilder:
                     )
                     cv2.imshow("im_dst mit Schwereachsen", self.im_dst)
 
- 
-def execute():
-    # TODO: This is the main function of image processing
-    pass
 
 def resize(img, size=[244,244], color=[55, 74, 195]):
     """ resizes image to size and fills up emty space with color
@@ -308,3 +304,31 @@ def resize(img, size=[244,244], color=[55, 74, 195]):
     return image
 
 
+def execute(img):
+    b = Bilder(img)
+    b.homography()
+
+    for i in range(len(b.j)):
+        image = cv2.circle(img, b.mc[i, :], 50, (255, 0, 0), 5)
+
+    b.findObject()
+
+    obj = b.obj
+    a = 10
+    for i in range(len(b.j)):
+        # image = cv2.circle(b.mask, b.mc[i,:], 10, (255, 0, 0), 7)
+
+        cv2.rectangle(
+            b.im_dst,
+            (obj[i, 0] - a, obj[i, 1] - a),
+            (obj[i, 0] + obj[i, 2] + a, a + obj[i, 1] + obj[i, 3]),
+            (0, 255, 0),
+            1,
+        )
+
+    image_array = [None]*len(b.mp)
+
+    for i in range(0,len(b.mp)):
+            image_array[i] = cv2.cvtColor(b.mp[i],cv2.COLOR_BGR2RGB)  
+
+    return image_array
