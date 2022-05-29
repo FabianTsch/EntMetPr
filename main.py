@@ -23,7 +23,6 @@ img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 img = bv.homography(img)
 
 img_array, obj_position, obj_orientation = bv.object_detection(img)
-print(obj_position)
 
 obj_class = oc.execute(img_array)
 
