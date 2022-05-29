@@ -20,8 +20,11 @@ import tcp_socket as tcp
 #       the camera function isn't implemented.
 img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 
-img_array = bv.execute(img)
+img = bv.homography(img)
 
-obj_class, img_array = oc.execute(img_array)
+img_array, obj_position, obj_orientation = bv.object_detection(img)
+print(obj_position)
+
+obj_class = oc.execute(img_array)
 
 tcp.execute()
