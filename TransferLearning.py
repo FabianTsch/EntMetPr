@@ -1,20 +1,13 @@
-# Grundstuktur von: https://towardsdatascience.com/transfer-learning-with-convolutional-neural-networks-in-pytorch-dd09190245ce
-#              und https://github.com/WillKoehrsen/pytorch_challenge/blob/master/Setup%20Transfer%20Learning%20in%20PyTorch.ipynb
+#######################################################################
+#                               Imports                               #
+#######################################################################
 
-
-#%%  Drittbibliotheken
-
-from IPython.core.interactiveshell import InteractiveShell
-import seaborn as sns
 # PyTorch
 from torchvision import transforms, datasets, models
 import torch
 from torch import optim, cuda
 from torch.utils.data import DataLoader, sampler
 import torch.nn as nn
-
-import warnings
-warnings.filterwarnings('ignore', category=FutureWarning)
 
 # Data science tools
 import numpy as np
@@ -23,29 +16,20 @@ import os
 
 # Image manipulations
 from PIL import Image
-# Useful for examining network
-from torchsummary import summary
+
 # Timing utility
 from timeit import default_timer as timer
 
 # Visualizations
 import matplotlib.pyplot as plt
-plt.rcParams['font.size'] = 14
-
-# Printing out all outputs
-InteractiveShell.ast_node_interactivity = 'all'
 
 
+# Grundstuktur von: https://towardsdatascience.com/transfer-learning-with-convolutional-neural-networks-in-pytorch-dd09190245ce
+#              und https://github.com/WillKoehrsen/pytorch_challenge/blob/master/Setup%20Transfer%20Learning%20in%20PyTorch.ipynb
 
-
-
-#%% Functions
-
-def imshow(image):
-    plt.figure(figsize = (6, 6))
-    plt.imshow(image)
-    plt.axis('off');
-    plt.show();
+#######################################################################
+#                              Functions                              #
+#######################################################################
 
 def get_pretrained_model(model_name):
     """Retrieve a pre-trained model from torchvision
@@ -379,12 +363,12 @@ def load_checkpoint(path):
 
     return model, optimizer
 
-# ****************************************************************************************************************************************************************
 # Dient zum Evaluierung des Modells --> Funktioniert noch nicht perfekt!
-def process_image(image_path):
+def process_image(image_array):
     """Process an image path into a PyTorch tensor"""
 
-    image = Image.open(image_path)
+    image = Image.fromarray(image_array)
+
     # Resize
     img = image.resize((256, 256))
 
@@ -436,7 +420,7 @@ def imshow_tensor(image, ax=None, title=None):
 
     return ax, image
 
-def predict(image_path, model, topk=2):
+def predict(image_array, model, topk=2):
     """Make a prediction for an image using a trained model
 
     Params
@@ -448,12 +432,9 @@ def predict(image_path, model, topk=2):
     Returns
 
     """
-      
-
-    real_class = image_path.split('/')[-2]
 
     # Convert to pytorch tensor
-    img_tensor = process_image(image_path)
+    img_tensor = process_image(image_array)
 
     # Resize  
     img_tensor = img_tensor.view(1, 3, 224, 224)
@@ -474,7 +455,7 @@ def predict(image_path, model, topk=2):
         ]
         top_p = topk.cpu().numpy()[0]
 
-        return img_tensor.cpu().squeeze(), top_p, top_classes, real_class
+        return img_tensor.cpu().squeeze(), top_p, top_classes
 
 def random_test_image():
     datadir = os.path.dirname(os.path.abspath(__file__))+'/Trainingbilder/'
@@ -772,7 +753,7 @@ def trainieren_save():
     print(f'{total_trainable_params:,} training parameters.')
 
     model = get_pretrained_model('vgg16')
-    summary(model, input_size=(3, 224, 224), batch_size=batch_size, device='cuda')
+    # summary(model, input_size=(3, 224, 224), batch_size=batch_size, device='cuda')
 
 
     print(model.classifier[6])

@@ -129,4 +129,6 @@ dmypy.json
 .pyre/
 
 # Data
-*gz
+*.gz
+*.pt
+*.pth
