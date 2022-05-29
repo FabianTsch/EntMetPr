@@ -20,4 +20,4 @@ def execute(images):
         img, ps, classes = tl.predict(images[i], model, topk=2)
         class_predicted[i] = classes[0]
 
-    return class_predicted, images
+    return class_predicted
