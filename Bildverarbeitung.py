@@ -16,7 +16,7 @@ class Bilder:
         self.__img = img                                # origin img 
         self.__x = 750                                  # Width of the img after homography
         self.__y = 500                                  # Hight of the img after homography
-        self.__counturs = np.array([], dtype=int)              # Counturs of interest after Counturs filter
+        self.__contours = np.array([], dtype=int)       # contours of interest after Counturs filter
         self.__count = 0                                # to devide the two mask types (before and after homography)
         self.__obj = []                                 # np.array([x,y,w,h])  dimensions of the rec_counturs
         self.__mc = []                                  # mass center points
@@ -52,7 +52,7 @@ class Bilder:
             
         elif target == self.__TARGET_OBJECTS:
             gray = cv2.cvtColor(self.__im_dst, cv2.COLOR_BGR2GRAY)
-            self.__counturs = [] # Clear the storage
+            self.__contours = [] # Clear the storage
             return cv2.inRange(gray, 130, 255)
            
 
@@ -99,39 +99,39 @@ class Bilder:
                 
         """
 
-        self.contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
                 
         # Counturs Filtern 
-        for i in range(len(self.contours)):       
-            area = cv2.contourArea(self.contours[i])
+        for i in range(len(contours)):       
+            area = cv2.contourArea(contours[i])
 
             if area > 150 and target == self.__TARGET_HOMOGRAPHY_POINTS:                 
-                self.__counturs = np.append(self.__counturs,[i] )
+                self.__contours = np.append(self.__contours,[i] )
 
             elif area > 100  and target == self.__TARGET_OBJECTS:                   # Fläche Überprüfen
-                x,y,w,h = cv2.boundingRect(self.contours[i]) 
+                x,y,w,h = cv2.boundingRect(contours[i]) 
                 if 0< x < self.__x and 0< y < self.__y:                # Position Überprüfen
                     obj =      np.array([x,y,w,h]) 
-                    self.__counturs =   np.append(self.__counturs,[i] )  
+                    self.__contours =   np.append(self.__contours,[i] )  
                     self.__obj = np.append(self.__obj,obj)
 
-        self.__counturs = self.__counturs[0:len(self.__counturs)]  
-        self.__counturs = self.__counturs.astype(int)
+        self.__contours = self.__contours[0:len(self.__contours)]  
+        self.__contours = self.__contours.astype(int)
         
         if target == self.__TARGET_OBJECTS:
-            self.__obj = np.resize(self.__obj,(len(self.__counturs),4))   
+            self.__obj = np.resize(self.__obj,(len(self.__contours),4))   
             self.__obj = self.__obj.astype(int)
 
 
         # Get the moments
-        mu = [None]*len(self.__counturs)
-        for i in range(len(self.__counturs)):            
-            mu[i] = cv2.moments(self.contours[self.__counturs[i]])
+        mu = [None]*len(self.__contours)
+        for i in range(len(self.__contours)):            
+            mu[i] = cv2.moments(contours[self.__contours[i]])
 
 
         # Get the mass centers
-        mc = [None]*len(self.__counturs)
-        for i in range(len(self.__counturs)):           
+        mc = [None]*len(self.__contours)
+        for i in range(len(self.__contours)):           
             # add 1e-5 to avoid division by zero
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))        
         mc = np.asarray(mc)   # Konvertierung in ein Array        
@@ -141,14 +141,14 @@ class Bilder:
         if target == self.__TARGET_OBJECTS:
                    
             # Get the orientation
-            mo = [None]*len(self.__counturs)
-            for i in range(len(self.__counturs)):   
+            mo = [None]*len(self.__contours)
+            for i in range(len(self.__contours)):   
                 mo[i] = self.getOrientation(mu[i])
             self.mo = np.asarray(mo)
 
             # Get mini Pictures of each obj
-            self.__mp = [None]*len(self.__counturs)
-            for i in range(len(self.__counturs)):
+            self.__mp = [None]*len(self.__contours)
+            for i in range(len(self.__contours)):
                 self.__mp[i] = self.cut(self.__im_dst, self.__obj[i])
 
 
