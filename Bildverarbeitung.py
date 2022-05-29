@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  2 15:19:54 2022
-
-@author: Stefan Kaufmann
-Abschlussprojekt
-
-1_ Bildbearbeitung
-"""
-
 #standard import
 import matplotlib as plt
 import numpy as np
