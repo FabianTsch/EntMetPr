@@ -1,4 +1,3 @@
-#standard import
 import matplotlib as plt
 import numpy as np
 from math import pi
@@ -11,6 +10,9 @@ from math import atan2, cos, sin, sqrt, pi
 
 class Bilder:  
     def __init__(self, img):              
+        self.__TARGET_HOMOGRAPHY_POINTS = 0
+        self.__TARGET_OBJECTS = 1 
+
         self.__img = img                                # origin img 
         self.__x = 750                                  # Width of the img after homography
         self.__y = 500                                  # Hight of the img after homography
@@ -22,15 +24,15 @@ class Bilder:
         self.__mp = [None]                              # array for mini pictures
         self.plot = False                             # Plotten der Schwereachsen
 
+        self.find_objects(target=self.__TARGET_HOMOGRAPHY_POINTS)
         self.homography()
-        self.maske()
-        self.segmentation()
+        self.find_objects(target=self.__TARGET_OBJECTS)
 
     @property
     def mp(self):
         return self.__mp
 
-    def maske(self):
+    def maske(self, target):
         """Creats a Mask for the Origin img and for the img after the homography
             Params
              --------
@@ -42,20 +44,16 @@ class Bilder:
                 mask:  mask as binary img
         """
         
-        if self.__count == 0:
+        if target == self.__TARGET_HOMOGRAPHY_POINTS:
             lower = np.array([40,80,80]) 
             upper = np.array([86,230,230]) 
             hsv = cv2.cvtColor(self.__img, cv2.COLOR_BGR2HSV)
-            self.mask = cv2.inRange(hsv, lower, upper) 
-            if self.plot:
-                cv2.imshow('Maske', self.mask)
+            return cv2.inRange(hsv, lower, upper) 
             
-        else:
+        elif target == self.__TARGET_OBJECTS:
             gray = cv2.cvtColor(self.__im_dst, cv2.COLOR_BGR2GRAY)
-            self.mask = cv2.inRange(gray, 130, 255)
-            self.__counturs = []                    # Clear the storage
-            if self.plot:
-                cv2.imshow('Maske2', self.mask)
+            self.__counturs = [] # Clear the storage
+            return cv2.inRange(gray, 130, 255)
            
 
     def homography(self):    
@@ -67,20 +65,7 @@ class Bilder:
             --------
                 im_dst:  img after homography as RGB
         """
-        
-        if self.plot:
-            print('aurichten')
-         
-         # find Objects  
-        self.maske()
-        self.segmentation()
-        
-        
         # MC sortieren                    
-        # TODO: self.mc does not seem to be part of the object
-        # Scheint benutzt zu werden um die Markierungspunkte 
-        # für die Homographie zu finden.
-        mc = self.__mc
         self.__mc = self.__mc[self.__mc[:,1].argsort()]        
         #print(self.mc)
         if self.__mc[0,0] < self.__mc[1,0]:            
@@ -104,7 +89,7 @@ class Bilder:
             print('Ende erster Durchlauf')
     
         
-    def segmentation(self):
+    def segmentation(self,mask,target):
         """Finds the Counturs, center of mass, main direction and Filters Conturs that are not possible 
             Params
              --------                                 
@@ -114,14 +99,16 @@ class Bilder:
                 
         """
 
-        self.contours, hierarchy = cv2.findContours(self.mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
+        self.contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
                 
         # Counturs Filtern 
         for i in range(len(self.contours)):       
             area = cv2.contourArea(self.contours[i])
-            if area > 150 and self.__count == 0:                 
+
+            if area > 150 and target == self.__TARGET_HOMOGRAPHY_POINTS:                 
                 self.__counturs = np.append(self.__counturs,[i] )
-            elif area > 100  and self.__count > 0:                   # Fläche Überprüfen
+
+            elif area > 100  and target == self.__TARGET_OBJECTS:                   # Fläche Überprüfen
                 x,y,w,h = cv2.boundingRect(self.contours[i]) 
                 if 0< x < self.__x and 0< y < self.__y:                # Position Überprüfen
                     obj =      np.array([x,y,w,h]) 
@@ -131,7 +118,7 @@ class Bilder:
         self.__counturs = self.__counturs[0:len(self.__counturs)]  
         self.__counturs = self.__counturs.astype(int)
         
-        if self.__count > 0:
+        if target == self.__TARGET_OBJECTS:
             self.__obj = np.resize(self.__obj,(len(self.__counturs),4))   
             self.__obj = self.__obj.astype(int)
 
@@ -151,7 +138,7 @@ class Bilder:
         self.__mc = mc.astype(int)
         
         
-        if self.__count > 0:
+        if target == self.__TARGET_OBJECTS:
                    
             # Get the orientation
             mo = [None]*len(self.__counturs)
@@ -164,7 +151,10 @@ class Bilder:
             for i in range(len(self.__counturs)):
                 self.__mp[i] = self.cut(self.__im_dst, self.__obj[i])
 
-        self.__count += 1 # Nächster Schritt
+
+    def find_objects(self,target):
+        maske = self.maske(target)
+        self.segmentation(maske,target)
     
 
     def getOrientation(self, mu):
@@ -215,7 +205,7 @@ class Bilder:
         h = int(obj[3])
                
         image = img[(y-d):(y+h+d), (x-d):(x+w+d)]
-        if self.plot == True:
+        if self.plot:
             cv2.imshow('Bilder_zugeschnitten', image)           
         return image
 
