@@ -20,20 +20,26 @@ from math import atan2, cos, sin, sqrt, pi
 
 
 class Bilder:  
-    
-    x = 750                                  # Width of the img after homography
-    y = 500                                  # Hight of the img after homography
-    j = np.array([], dtype=int)              # Counturs of interest after Counturs filter
-    count = 0                                # to devide the two mask types (before and after homography)
-    obj = []                                 # np.array([x,y,w,h])  dimensions of the rec_counturs
-    im_dst = 0                               # img after Homography as RGB
-    plot = False                             # Plotten der Schwereachsen
-
-
-       
     def __init__(self, img):              
-         self.img = img                     # origin img 
-         
+        self.__img = img                                # origin img 
+        self.__x = 750                                  # Width of the img after homography
+        self.__y = 500                                  # Hight of the img after homography
+        self.__counturs = np.array([], dtype=int)              # Counturs of interest after Counturs filter
+        self.__count = 0                                # to devide the two mask types (before and after homography)
+        self.__obj = []                                 # np.array([x,y,w,h])  dimensions of the rec_counturs
+        self.__mc = []                                  # mass center points
+        self.__im_dst = 0                               # img after Homography as RGB
+        self.__mp = [None]                              # array for mini pictures
+        self.plot = False                             # Plotten der Schwereachsen
+
+        self.homography()
+        self.maske()
+        self.segmentation()
+
+    @property
+    def mp(self):
+        return self.__mp
+
     def maske(self):
         """Creats a Mask for the Origin img and for the img after the homography
             Params
@@ -46,32 +52,27 @@ class Bilder:
                 mask:  mask as binary img
         """
         
-        if self.count == 0:
+        if self.__count == 0:
             lower = np.array([40,80,80]) 
             upper = np.array([86,230,230]) 
-            hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
+            hsv = cv2.cvtColor(self.__img, cv2.COLOR_BGR2HSV)
             self.mask = cv2.inRange(hsv, lower, upper) 
             if self.plot:
                 cv2.imshow('Maske', self.mask)
             
         else:
-            gray = cv2.cvtColor(self.im_dst, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(self.__im_dst, cv2.COLOR_BGR2GRAY)
             self.mask = cv2.inRange(gray, 130, 255)
-            self.j = []                    # Clear the storage
+            self.__counturs = []                    # Clear the storage
             if self.plot:
                 cv2.imshow('Maske2', self.mask)
            
-       
 
-      
-    
     def homography(self):    
-
         """Call  maske() and segmentation(), sort the Points and make the homography
             Params
              --------
                                    
-
             Returns
             --------
                 im_dst:  img after homography as RGB
@@ -86,26 +87,29 @@ class Bilder:
         
         
         # MC sortieren                    
-        mc = self.mc
-        self.mc = self.mc[self.mc[:,1].argsort()]        
+        # TODO: self.mc does not seem to be part of the object
+        # Scheint benutzt zu werden um die Markierungspunkte 
+        # für die Homographie zu finden.
+        mc = self.__mc
+        self.__mc = self.__mc[self.__mc[:,1].argsort()]        
         #print(self.mc)
-        if self.mc[0,0] < self.mc[1,0]:            
-            temp = np.copy(self.mc[0,:])
-            self.mc[0,:] = self.mc[1,:]
-            self.mc[1,:] = temp
+        if self.__mc[0,0] < self.__mc[1,0]:            
+            temp = np.copy(self.__mc[0,:])
+            self.__mc[0,:] = self.__mc[1,:]
+            self.__mc[1,:] = temp
     
-        if self.mc[2,0] > self.mc[3,0]:             
-              temp = np.copy(self.mc[2,:])
-              self.mc[2,:] = self.mc[3,:]
-              self.mc[3,:] = temp
+        if self.__mc[2,0] > self.__mc[3,0]:             
+              temp = np.copy(self.__mc[2,:])
+              self.__mc[2,:] = self.__mc[3,:]
+              self.__mc[3,:] = temp
         
                         
         # Points in destination image        
-        points_dst = np.array([ [self.x, 0], [0, 0],[0, self.y],[self.x, self.y] ])
+        points_dst = np.array([ [self.__x, 0], [0, 0],[0, self.__y],[self.__x, self.__y] ])
         
         # Homography
-        h, status = cv2.findHomography(self.mc, points_dst)          
-        self.im_dst = cv2.warpPerspective(self.img, h, (self.x,self.y))
+        h, status = cv2.findHomography(self.__mc, points_dst)          
+        self.__im_dst = cv2.warpPerspective(self.__img, h, (self.__x,self.__y))
         if self.plot:
             print('Ende erster Durchlauf')
     
@@ -125,53 +129,52 @@ class Bilder:
         # Counturs Filtern 
         for i in range(len(self.contours)):       
             area = cv2.contourArea(self.contours[i])
-            if area > 150 and self.count == 0:                 
-                self.j = np.append(self.j,[i] )
-            elif area > 100  and self.count > 0:                   # Fläche Überprüfen
+            if area > 150 and self.__count == 0:                 
+                self.__counturs = np.append(self.__counturs,[i] )
+            elif area > 100  and self.__count > 0:                   # Fläche Überprüfen
                 x,y,w,h = cv2.boundingRect(self.contours[i]) 
-                if 0< x < self.x and 0< y < self.y:                # Position Überprüfen
+                if 0< x < self.__x and 0< y < self.__y:                # Position Überprüfen
                     obj =      np.array([x,y,w,h]) 
-                    self.j =   np.append(self.j,[i] )  
-                    self.obj = np.append(self.obj,obj)
+                    self.__counturs =   np.append(self.__counturs,[i] )  
+                    self.__obj = np.append(self.__obj,obj)
 
-        self.j = self.j[0:len(self.j)]  
-        self.j = self.j.astype(int)
+        self.__counturs = self.__counturs[0:len(self.__counturs)]  
+        self.__counturs = self.__counturs.astype(int)
         
-        if self.count > 0:
-            self.obj = np.resize(self.obj,(len(self.j),4))   
-            self.obj = self.obj.astype(int)
+        if self.__count > 0:
+            self.__obj = np.resize(self.__obj,(len(self.__counturs),4))   
+            self.__obj = self.__obj.astype(int)
 
 
         # Get the moments
-        mu = [None]*len(self.j)
-        for i in range(len(self.j)):            
-            mu[i] = cv2.moments(self.contours[self.j[i]])
+        mu = [None]*len(self.__counturs)
+        for i in range(len(self.__counturs)):            
+            mu[i] = cv2.moments(self.contours[self.__counturs[i]])
 
 
         # Get the mass centers
-        mc = [None]*len(self.j)
-        for i in range(len(self.j)):           
+        mc = [None]*len(self.__counturs)
+        for i in range(len(self.__counturs)):           
             # add 1e-5 to avoid division by zero
             mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))        
         mc = np.asarray(mc)   # Konvertierung in ein Array        
-        self.mc = mc.astype(int)
+        self.__mc = mc.astype(int)
         
         
-        if self.count > 0:
+        if self.__count > 0:
                    
             # Get the orientation
-            mo = [None]*len(self.j)
-            for i in range(len(self.j)):   
+            mo = [None]*len(self.__counturs)
+            for i in range(len(self.__counturs)):   
                 mo[i] = self.getOrientation(mu[i])
             self.mo = np.asarray(mo)
-            
-            # Get mini Pictures of each obj            
-            mp = [None]*len(self.j)
-            for i in range(len(self.j)):   
-                mp[i] = self.cut(self.im_dst, self.obj[i])            
-            self.mp = mp
 
-        self.count += 1 # Nächster Schritt
+            # Get mini Pictures of each obj
+            self.__mp = [None]*len(self.__counturs)
+            for i in range(len(self.__counturs)):
+                self.__mp[i] = self.cut(self.__im_dst, self.__obj[i])
+
+        self.__count += 1 # Nächster Schritt
     
 
     def getOrientation(self, mu):
@@ -186,7 +189,6 @@ class Bilder:
                 
         """
     
-        
         x = int(mu["m10"] / mu["m00"])
         y = int(mu["m01"] / mu["m00"])
         center = (x,y)
@@ -201,23 +203,10 @@ class Bilder:
         
         alpha = np.round(atan2(ev[0,1],ev[1,1])*180/pi-90 +360   ,1)           
     
-        s = 20  # Skalierung der Pfeile
-        
-        if self.plot == True:            
-            font = cv2.FONT_HERSHEY_SIMPLEX   
-            fontScale = 0.6
-            color = (0, 0, 0)
-            thickness = 1
-            cv2.putText(self.im_dst, str(alpha), (x,y) , font, fontScale, color, thickness)
-            image = cv2.line(self.im_dst, center, (x+int(ev[0,0]*s),y+int(ev[1,0]*s)), (0,255,0), 2)
-            self.image = cv2.line(self.im_dst, center, (x+int(ev[0,1]*s*3),y+int(ev[1,1]*s*3)), (0,0,0), 2)                     
-            cv2.imshow('Schwereachsen', self.image)        
-         
         return alpha
         
      
     def cut(self, img, obj):
-
         """ Cut the given img around the given objectsize and the center of mass with some overhang
             Params
             --------
@@ -240,44 +229,7 @@ class Bilder:
             cv2.imshow('Bilder_zugeschnitten', image)           
         return image
 
-    def findObject(self):
-
-        """ Makes a mask and find the Object after the Homography 
-            --------                                  
-
-            Returns
-            --------
-                            
-        """
-        self.maske()
-        self.segmentation()
-
-
-    def display_img(self):
-        """ Shows some pictures of the process
-                                    
-        """
-
-
-        if self.plot:     
-                       
-
-            if self.count>0:
-                
-                a = 10
-                for i in range(len(self.j)):
-
-                    cv2.rectangle(
-                        self.im_dst,
-                        (self.obj[i, 0] - a, self.obj[i, 1] - a),
-                        (self.obj[i, 0] + self.obj[i, 2] + a, a + self.obj[i, 1] + self.obj[i, 3]),
-                        (0, 255, 0),
-                        1,
-                    )
-                    cv2.imshow("im_dst mit Schwereachsen", self.im_dst)
-
-
-def resize(img, size=[244,244], color=[55, 74, 195]):
+def resize(img, size=[224,224], color=[55, 74, 195]):
     """ resizes image to size and fills up emty space with color
     Params
     --------
@@ -305,30 +257,21 @@ def resize(img, size=[244,244], color=[55, 74, 195]):
 
 
 def execute(img):
+    """ searches for object in img and extracts them into
+    img_arrry
+    Params
+    --------
+    img: Image including all Objects 
+
+    Returns
+    --------
+    image: Image array with seperated objects 
+    """
     b = Bilder(img)
-    b.homography()
 
-    for i in range(len(b.j)):
-        image = cv2.circle(img, b.mc[i, :], 50, (255, 0, 0), 5)
-
-    b.findObject()
-
-    obj = b.obj
-    a = 10
-    for i in range(len(b.j)):
-        # image = cv2.circle(b.mask, b.mc[i,:], 10, (255, 0, 0), 7)
-
-        cv2.rectangle(
-            b.im_dst,
-            (obj[i, 0] - a, obj[i, 1] - a),
-            (obj[i, 0] + obj[i, 2] + a, a + obj[i, 1] + obj[i, 3]),
-            (0, 255, 0),
-            1,
-        )
-
-    image_array = [None]*len(b.mp)
-
+    # change color BGR to RGB
+    img_array = [None]*len(b.mp)
     for i in range(0,len(b.mp)):
-            image_array[i] = cv2.cvtColor(b.mp[i],cv2.COLOR_BGR2RGB)  
+            img_array[i] = cv2.cvtColor(b.mp[i],cv2.COLOR_BGR2RGB)  
 
-    return image_array
+    return img_array
