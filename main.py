@@ -18,21 +18,20 @@ import communication as cm
 #######################################################################
 
 print("Start Loop")
-while True:
-    # TODO: path as @para is only a temporary solution as long as the
-    #       the camera function isn't implemented.
-    img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
+# TODO: path as @para is only a temporary solution as long as the
+#       the camera function isn't implemented.
+img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 
-    img = bv.homography(img)
+img = bv.homography(img)
 
-    # TODO: add orientation
-    img_array, x, y, angle = bv.object_detection(img)
-    orientation = np.full(len(angle),2) # Alle liegend
+# TODO: add orientation
+img_array, x, y, angle = bv.object_detection(img)
+orientation = np.full(len(angle),2) # Alle liegend
 
-    # TODO: break when liste is empty
+# TODO: break when liste is empty
 
-    obj_class = oc.execute(img_array)
+obj_class = oc.execute(img_array)
 
-    type, orientation, x, y, angle = cm.execute(obj_class,orientation, x, y, angle)
+type, orientation, x, y, angle, error = cm.execute(obj_class,orientation, x, y, angle)
 
-    tcp.tcp_communication(type, orientation, x, y, angle)
+#tcp.tcp_communication(type, orientation, x, y, angle)
