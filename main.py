@@ -9,7 +9,8 @@ import matplotlib.pyplot as plt
 import camera
 import Bildverarbeitung as bv
 import objectclassification as oc
-import tcp_socket as tcp
+import tcpClient as tcp
+import communication as cm 
 
 
 #######################################################################
