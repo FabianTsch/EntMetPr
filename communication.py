@@ -162,7 +162,9 @@ def pick(type, orientation,x,y,angle,img,move=False, workspace=100):
         y_img -= workspace*2
         x_img -= workspace*2
     img_tool = createObj(type, orientation,x,y,angle, (x_img,y_img), True, move)
-
+    if plot:
+        cv2.imshow('img+tool', img+img_tool)
+        cv2.waitKey()
     img_bitwise_and = cv2.bitwise_and(img, img_tool)
     if img_bitwise_and.any():
         possible = False
@@ -227,7 +229,7 @@ def checkPick(type, orientation,x,y,angle,orig, img = 0):
                 if plot:
                     print('Der Sublauf: ', i)   
                     print('##### j ist: ', j)          
-                if not i in j and pick(type[i], orientation[i],x[i],y[i],angle[i],img):   # Controls if any i ist part of j and if obj[i] is pickable             
+                if not i in j and pick(type[i], orientation[i],x[i],y[i],angle[i],img):   # Controls if any i ist part of j and if obj[i] is pickable            
                                    
                     j = np.append(j,i)   
                     img -=createImg(type[i], orientation[i],x[i],y[i],angle[i],orig) # subtracts the object from the image  
@@ -236,7 +238,7 @@ def checkPick(type, orientation,x,y,angle,orig, img = 0):
                         cv2.waitKey()            
                     
             
-
+    
     return j, img
 
 def nearObj(x,y,x1,y1):
@@ -307,9 +309,7 @@ def createSubGroup(type, orientation,x,y,angle, area=0):
             if type[i] == 1 and orientation[i] == 2:
                 surface[i] = 2
             elif type[i] == 2 and orientation[i] == 1:
-                surface[i] == 0.5
-        print('Areas',surface) 
-        print('orientation',orientation) 
+                surface[i] == 0.5        
     else:
         surface = area
     
@@ -397,8 +397,9 @@ def createGroup(type, orientation,x,y,angle,j):
     
     m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
     
-    print('Area:', m_area)
-    print('Ende Fkt')
+    if plot:
+        print('Area:', m_area)
+        print('Ende Fkt')
     return m_type, m_orientation, m_x, m_y, m_angle
  
 def move(type, orientation,x, y, angle, orig, img):
@@ -422,12 +423,20 @@ def move(type, orientation,x, y, angle, orig, img):
 
     # check if their are more than one group
     if np.size(x) == 1:
-        return 3, 1, x,y,angle + 90, 0
+
+        alpha = angle + 90
+
+        while pick(1,2,x,y,alpha,img,True):
+            x_m -= np.cos(np.deg2rad(m_alpha)) * 1
+            y_m -= np.sin(np.deg2rad(m_alpha)) * 1
+        return 3, 1, x_m,y_m,alpha, 0
 
     # important variables
     threshold = np.inf
     alpha = np.zeros(np.size(x))
     error = np.zeros(np.size(x))
+    m_x = np.zeros(np.size(x))
+    m_y = np.zeros(np.size(x))
     
     
     # Corrects unwanted angles
@@ -452,10 +461,13 @@ def move(type, orientation,x, y, angle, orig, img):
         # second step search for the ideal attack vector
         # creat the vektor between the two Groups
         m_alpha = np.arctan2((y[j]-y[count]),(x[j]-x[count]))  
+        if plot:
+            print('m_alpha: ',m_alpha)
 
         # check if this position is reachable      
         x_m = r*np.cos(m_alpha)/2 + x[count]
         y_m = r*np.sin(m_alpha)/2 + y[count] 
+        m_alpha = m_alpha*180/np.pi+180
         while not pick(1,2,x_m,y_m,m_alpha,img,True):  # if alpha is not poissible --> rotate alpha 
             m_alpha += 5    
             z += 5
@@ -463,12 +475,22 @@ def move(type, orientation,x, y, angle, orig, img):
                 print('Error --> keine erreichbare Position gefunden')
                 error[count] = 1
                 break 
-           
-        alpha[count] = m_alpha*180/np.pi+180
+        
+        # find the distance to the obj make steps of 1 mm
+        while pick(1,2,x_m,y_m,m_alpha,img,True):
+            x_m += np.cos(np.deg2rad(m_alpha)) * 1
+            y_m += np.sin(np.deg2rad(m_alpha)) * 1
+            
+          
+        alpha[count] = m_alpha
+        m_x[count] = int(x_m)
+        m_y[count] = int(y_m)
  
+
+
     m_type = np.ones(np.size(x)) *3           # set type seperate
 
-    return m_type, orientation,x,y, alpha, error
+    return m_type, orientation,m_x,m_y, alpha, error
 
 def execute(type, orientation,x,y,angle, orig=[750,500]):
     """Execute file for creating list of objs
@@ -531,7 +553,7 @@ def execute(type, orientation,x,y,angle, orig=[750,500]):
 
     return a_type, r_orientation, a_x, a_y, a_angle, error
 
-        
+     
 
 
 
@@ -539,62 +561,71 @@ def execute(type, orientation,x,y,angle, orig=[750,500]):
 # %%
 
 # ****************************************************************************************************************************************************************
-# main
-# ****************************************************************************************************************************************************************
-#For Testing
-# image size
-x = 750          
-y = 500
+def test():
+    # ****************************************************************************************************************************************************************
+    #For Testing
+    # image size
+    x = 750          
+    y = 500
 
-type = [1,1,1,1]
-orientation = [1,2, 1, 2]
-x_obj = [0,5, 200, 200]
-y_obj = [0,5, 200, 200]
-angle = [0,0, 0, 20]
-orig = [x,y]
+    type = [1,1,1,1]
+    orientation = [1,2, 1, 2]
+    x_obj = [0,5, 200, 200]
+    y_obj = [0,5, 200, 200]
+    angle = [0,0, 0, 20]
+    orig = [x,y]
 
-img = createImg(type, orientation,x_obj,y_obj,angle, orig)
-img_tool =  createImg(type, orientation,x_obj,y_obj,angle, orig, True )
-
-
-
-# %%
-#First Part --> seperating all objetcs who can be picked
-print('##############################################################    Erster Teil')
-j = checkPick(type, orientation,x_obj,y_obj,angle,orig)
-print('Folgende Indizies sind aufgreifbar: ', j)
-cv2.imshow('alle Objekt', img+img_tool)
-img_tool =  np.zeros((orig[1], orig[0]))
-img = np.zeros((orig[1], orig[0]))
-for i in j:
-    i = int(i)
-    img += createImg(type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig )
-    img_tool += createImg(type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig, True )    
-cv2.imshow('alle Objekt welche aufgegriffen werden', img+img_tool)
-
-cv2.waitKey()
-
-# %%
-# Second Part  --> Creat Groups
-
-m_type, m_orientation, m_x, m_y, m_angle = createGroup(type, orientation,x_obj,y_obj,angle,j)
-print('##############################################################    Zweiter Teil')
-print('Type: ', m_type)
-print('Orientierung: ', m_orientation)
-print('x: ',m_x)
-print('y: ', m_y)
-print('angle: ', m_angle)
-
-# %%
-# Third Part --> Move Parts 
-
-m_type, orientation,x,y, alpha, error = move([1,1], [1,1],[0, 100], [0,100], [20,40], orig, img)
-print('##############################################################    Dritter Teil')
-print(alpha)
-print(m_type)
-print(error)
+    img = createImg(type, orientation,x_obj,y_obj,angle, orig)
+    img_tool =  createImg(type, orientation,x_obj,y_obj,angle, orig, True )
 
 
-# %%
+
+    # %%
+    #First Part --> seperating all objetcs who can be picked
+    print('##############################################################    Erster Teil')
+    j, img_check = checkPick(type, orientation,x_obj,y_obj,angle,orig)
+    print('Folgende Indizies sind aufgreifbar: ', j)
+    cv2.imshow('alle Objekt', img+img_tool)
+    img_tool =  np.zeros((orig[1], orig[0]))
+    img = np.zeros((orig[1], orig[0]))
+    for i in j:
+        i = int(i)
+        img += createImg(type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig )
+        img_tool += createImg(type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig, True )    
+    cv2.imshow('alle Objekt welche aufgegriffen werden', img+img_tool)
+
+    cv2.waitKey()
+
+    # %%
+    # Second Part  --> Creat Groups
+
+    m_type, m_orientation, m_x, m_y, m_angle = createGroup(type, orientation,x_obj,y_obj,angle,j)
+    print('##############################################################    Zweiter Teil')
+    print('Type: ', m_type)
+    print('Orientierung: ', m_orientation)
+    print('x: ',m_x)
+    print('y: ', m_y)
+    print('angle: ', m_angle)
+
+    # %%
+    # Third Part --> Move Parts 
+
+    m_type, orientation,x,y, alpha, error = move([1,1], [1,1],[0, 100], [0,100], [20,40], orig, img)
+    print('##############################################################    Dritter Teil')
+    print(alpha)
+    print(m_type)
+    print(error)
+
+
+    # %%
+    type = [1,1]
+    orientation = [1,2]
+    x = [0, 200]
+    y = [0,200]
+    angle = [0, 0]
+    img = createImg(type, orientation,x,y,angle, [750,500], )
+    a_type, a_orientation, a_x, a_y, a_angle, error = move(type, orientation,x, y, angle, [750,500], img)
+    print('Angle: ', a_angle)
+    print(' x: ', a_x,' y:', a_y )
 
 
