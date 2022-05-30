@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 from torch import threshold
 
-plot = True
+plot = False
 
 
 
@@ -170,7 +170,7 @@ def pick(type, orientation,x,y,angle,img,move=False, workspace=100):
         possible = True
 
     if plot:
-        img_bitwise_and = img_bitwise_and[(workspace+1):orig[1]+workspace, (workspace+1):orig[0]+workspace]  # shrinks the image to the area of ​​interest
+        img_bitwise_and = img_bitwise_and[(workspace+1):y_img+workspace, (workspace+1):x_img+workspace]  # shrinks the image to the area of ​​interest
         #cv2.imshow('bitwise_and', img_bitwise_and)
         #cv2.waitKey()
         if img_bitwise_and.any():
@@ -237,7 +237,7 @@ def checkPick(type, orientation,x,y,angle,orig, img = 0):
                     
             
 
-    return j
+    return j, img
 
 def nearObj(x,y,x1,y1):
     """Creats a Group of obj with are neare 
@@ -396,12 +396,12 @@ def createGroup(type, orientation,x,y,angle,j):
     
     
     m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
-    m_type = np.ones(np.size(m_x)) *3            # Type chanced to seperate
+    
     print('Area:', m_area)
     print('Ende Fkt')
     return m_type, m_orientation, m_x, m_y, m_angle
  
-def move(type, orientation,x, y, angle, orig):
+def move(type, orientation,x, y, angle, orig, img):
     """Creats the attack angle
         Params
          --------
@@ -422,16 +422,12 @@ def move(type, orientation,x, y, angle, orig):
 
     # check if their are more than one group
     if np.size(x) == 1:
-        return angle + 90
+        return 3, 1, x,y,angle + 90, 0
 
     # important variables
     threshold = np.inf
     alpha = np.zeros(np.size(x))
     error = np.zeros(np.size(x))
-
-    # creat img with all groups
-    img = createImg(type, orientation,x,y,angle, orig)
-
     
     
     # Corrects unwanted angles
@@ -472,9 +468,73 @@ def move(type, orientation,x, y, angle, orig):
  
     m_type = np.ones(np.size(x)) *3           # set type seperate
 
-    return alpha, m_type, error
+    return m_type, orientation,x,y, alpha, error
 
-  
+def execute(type, orientation,x,y,angle, orig=[750,500]):
+    """Execute file for creating list of objs
+        Params
+         --------
+        type:          screw = 1, nut = 2, seperate = 3, Done = 0, GoToHome = 10, 
+        orientation:   standing = 1, lying = 2,  perhabs more info    
+        x:             Position from origin in mm - x-Position
+        y:             Position from origin in mm - y-Position
+        angle:         Orientation of the main axis in grad  
+        orig:          Original dimensions [x,y] of the image   
+                
+        Returns
+        --------
+        r_type:          screw = 1, nut = 2, seperate = 3, Done = 0, GoToHome = 10, 
+        r_orientation:   standing = 1, lying = 2,  perhabs more info    
+        r_x:             Position from origin in mm - x-Position
+        r_y:             Position from origin in mm - y-Position
+        r_angle:         Orientation of the main axis in grad  
+        r_orig:          Original dimensions [x,y] of the image   
+                      
+                
+    """
+    # Return Values
+    
+    r_type = []
+    r_orientation = []
+    r_x = []
+    r_y = []
+    r_angle = []
+
+
+    # First Part -  check pick
+    j, img = checkPick(type, orientation,x,y,angle,orig)
+
+    if plot:
+        cv2.imshow('alle Gruppen', img)
+        cv2.waitKey()
+        
+    # Second Part -  Creat Groups
+    m_type, m_orientation, m_x, m_y, m_angle = createGroup(type, orientation,x,y,angle,j)
+    
+    
+    # Third Part Find attack angle
+    a_type, a_orientation, a_x, a_y, a_angle, error = move(m_type, m_orientation,m_x, m_y, m_angle, orig, img)
+
+    # Fouth Part - Creat list
+    for i in range(0,np.size(j)):
+        r_type = np.append(r_type, type[int(j[i])])
+        r_orientation = np.append(r_orientation, orientation[int(j[i])])
+        r_x = np.append(r_x, x[int(j[i])])
+        r_y = np.append(r_y, y[int(j[i])])
+        r_angle = np.append(r_angle, angle[int(j[i])])
+
+    r_type = np.append(r_type,m_type)
+    r_orientation = np.append(r_orientation, m_orientation)
+    r_x = np.append(r_x,m_x)
+    r_y = np.append(r_y,m_y)
+    r_angle = np.append(r_angle, m_angle)
+
+    return a_type, r_orientation, a_x, a_y, a_angle, error
+
+        
+
+
+
 
 # %%
 
@@ -488,8 +548,8 @@ y = 500
 
 type = [1,1,1,1]
 orientation = [1,2, 1, 2]
-x_obj = [25,200, 180, 180]
-y_obj = [25,200, 400, 200]
+x_obj = [0,5, 200, 200]
+y_obj = [0,5, 200, 200]
 angle = [0,0, 0, 20]
 orig = [x,y]
 
@@ -528,7 +588,7 @@ print('angle: ', m_angle)
 # %%
 # Third Part --> Move Parts 
 
-alpha, m_type, error = move([1,1], [1,1],[0, 100], [0,100], [20,40], orig)
+m_type, orientation,x,y, alpha, error = move([1,1], [1,1],[0, 100], [0,100], [20,40], orig, img)
 print('##############################################################    Dritter Teil')
 print(alpha)
 print(m_type)
