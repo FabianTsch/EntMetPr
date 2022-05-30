@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 from torch import threshold
 
-plot = False
+plot = True
 
 
 
@@ -301,14 +301,15 @@ def createSubGroup(type, orientation,x,y,angle, area=0):
          
     if np.isscalar(area):                         # For the first loop
         surface = np.ones(np.size(type))   
-        print('Surface',surface) 
-        print('orientation',orientation) 
+
         
         for i in range(0,np.size(type)):
             if type[i] == 1 and orientation[i] == 2:
                 surface[i] = 2
             elif type[i] == 2 and orientation[i] == 1:
                 surface[i] == 0.5
+        print('Areas',surface) 
+        print('orientation',orientation) 
     else:
         surface = area
     
@@ -395,6 +396,7 @@ def createGroup(type, orientation,x,y,angle,j):
     
     
     m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
+    m_type = np.ones(np.size(m_x)) *3            # Type chanced to seperate
     print('Area:', m_area)
     print('Ende Fkt')
     return m_type, m_orientation, m_x, m_y, m_angle
@@ -466,16 +468,13 @@ def move(type, orientation,x, y, angle, orig):
                 error[count] = 1
                 break 
            
-        alpha[count] = np.abs(m_alpha*180/np.pi)
+        alpha[count] = m_alpha*180/np.pi+180
  
     m_type = np.ones(np.size(x)) *3           # set type seperate
 
     return alpha, m_type, error
 
   
-    
-
-
 
 # %%
 
