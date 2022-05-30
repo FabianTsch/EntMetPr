@@ -10,22 +10,7 @@ import socket
 import time
 import struct
 
-# Create a TCP/IP socket
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-#create TCP client
-# Connect the socket to the port where the server is listening
-server_address = ('138.232.72.123', 6969)
-sock.connect(server_address)
-
-#---------------------------------------------------
-
-
-#---------------------------------------------------
-
-
 def tcp_communication(type, orientation,x,y,phi):
-
     """Sends the Params to the Stäubli and waits for response
         can handle arrays and scalars
         Params
@@ -41,6 +26,19 @@ def tcp_communication(type, orientation,x,y,phi):
         Error:         0 = no error, 1 = error
                 
      """
+    try:
+        # Create a TCP/IP socket
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        # create TCP client
+        # Connect the socket to the port where the server is listening
+        server_address = ('138.232.72.123', 6969)
+        sock.connect(server_address)
+    
+    except:
+        # TODO: Do not use bare except 
+        print("could not connect to server")
+        return 1
 
     for i in range(len(x)):
         # put data in array for sending
