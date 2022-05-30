@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CellUserOptions>
+  <Controller Name="CS9">
+    <Application>Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx</Application>
+  </Controller>
+  <Option Name="DataTreeView">
+    <Nodes>
+      <Node Path="Roboterzelle" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\bool" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\num" IsExpanded="true" />
+    </Nodes>
+  </Option>
+  <Option Name="CellExplorer">
+    <Nodes>
+      <Node Path="Roboterzelle" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\pick\Parameters" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\place\Parameters" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\TCPserver" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\TCPserver\Locals" IsExpanded="true" />
+    </Nodes>
+  </Option>
+  <Option Name="GeometryView">
+    <Nodes>
+      <Node Path="Roboterzelle" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\world[0]" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\world[0]\fUserFrame" IsExpanded="true" />
+      <Node Path="Roboterzelle\CS9\Entwicklungsmethodik\world[0]\fUserFrame\fUserFrame[0]" IsExpanded="true" />
+    </Nodes>
+  </Option>
+  <Option Name="Breakpoints">
+    <Breakpoints />
+  </Option>
+  <Option Name="IOsControlPanel">
+    <Ios />
+  </Option>
+  <Option Name="Watches">
+    <Watches>
+      <Watch Controller="CS9" Application="Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx">nData</Watch>
+      <Watch Controller="CS9" Application="Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx">nX</Watch>
+      <Watch Controller="CS9" Application="Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx">nY</Watch>
+      <Watch Controller="CS9" Application="Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx">bNewData</Watch>
+    </Watches>
+  </Option>
+  <Option Name="3DView">
+    <_3DView Visible="true" />
+  </Option>
+  <Option Name="SynchronizerMode">
+    <Synchronizers>
+      <Synchronizer Controller="CS9" Mode="Emulator" />
+    </Synchronizers>
+  </Option>
+  <Option Name="Safety">
+    <Safeties>
+      <Safety Controller="CS9" Visible="false" />
+    </Safeties>
+  </Option>
+</CellUserOptions>

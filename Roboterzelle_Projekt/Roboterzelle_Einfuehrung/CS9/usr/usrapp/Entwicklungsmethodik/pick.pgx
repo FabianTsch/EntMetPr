@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="pick">
+    <Parameters xmlns="http://www.staubli.com/robotics/VAL3/Param/1">
+      <Parameter name="x_nX" type="num" xsi:type="element" />
+      <Parameter name="x_nY" type="num" xsi:type="element" />
+    </Parameters>
+    <Code><![CDATA[begin
+  
+  
+  
+  pPick.trsf.x = x_nX*100
+  pPick.trsf.y = x_nY*100
+  
+  movej(appro(pPick,trApro),tGreifer, mUsedSpeed)
+  movel(pPick, tGreifer, mUsedSpeed)
+  close(tGreifer)
+  movel(appro(pPick, trApro), tGreifer, mUsedSpeed)
+  logMsg("Objekt aufgegriffen")
+  
+  
+
+  
+  
+end]]></Code>
+  </Program>
+</Programs>

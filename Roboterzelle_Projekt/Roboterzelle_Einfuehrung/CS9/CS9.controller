@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LocalController xmlns="http://www.staubli.com/robotics/controller/1">
+  <Version>s8.3.1Cs9_BS885</Version>
+  <Properties>
+    <Property type="SRS.VAL3Studio.Services.RobotSkinControllerProperty">
+      <RobotSkin xmlns="http://www.staubli.com/robotics/robotskincontrollerproperty/1">TX2_90L_PRESERIAL-HB-WS</RobotSkin>
+    </Property>
+    <Property type="SRS._3DView.Services.TcpControllerProperty">
+      <Tcp Name="Greifer.handler" xmlns="http://www.staubli.com/robotics/tcpcontrollerproperty/1" />
+    </Property>
+  </Properties>
+  <Target hostname="" name="Default">
+    <Context type="RemoteConnection" port="5653" username="default" />
+    <Context type="WebRemoteMaintenance" port="80" username="default" />
+    <Context type="VncRemoteMaintenance" port="5900" username="default" />
+  </Target>
+</LocalController>

@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Data/2">
+  <Datas>
+    <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
+    <Data name="fUserFrame" access="private" xsi:type="array" type="frame" size="1">
+      <Value key="0" x="701.757897" y="-321.609007" z="-207.673108" rx="-0.0947033" ry="0.52905" rz="90.111007" fatherId="world[0]" />
+    </Data>
+    <Data name="tGreifer" access="private" xsi:type="array" type="tool" size="1">
+      <Value key="0" x="1.13686837721616E-13" y="-4.40536496171262E-13" z="110.500000000003" rx="-1.59027734073174E-14" ry="3.10104081442691E-14" rz="-2.14687465591809E-14" fatherId="flange[0]" ioLink="ValveIO\valve1" ioOpen="0.05" ioClose="0.05" />
+    </Data>
+    <Data name="pABPosition" access="private" xsi:type="array" type="pointRx" size="12">
+      <Value key="0" x="100" y="100" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="1" x="200" y="100" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="2" x="300" y="100" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="3" x="400" y="100" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="4" x="100" y="200" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="5" x="200" y="200" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="6" x="300" y="200" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="7" x="400" y="200" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="8" x="100" y="300" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="9" x="200" y="300" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="10" x="300" y="300" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="11" x="400" y="300" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="soTcpClient" access="private" xsi:type="array" type="sio" size="1">
+      <Value key="0" link="Socket\server0" />
+    </Data>
+    <Data name="bNewData" access="private" xsi:type="array" type="bool" size="2" />
+    <Data name="nData" access="private" xsi:type="array" type="num" size="3" />
+    <Data name="bReady" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="jHome" access="private" xsi:type="array" type="jointRx" size="1">
+      <Value key="0" j3="90" j5="90" />
+    </Data>
+    <Data name="mUsedSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
+    <Data name="pPick" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="trApro" access="private" xsi:type="array" type="trsf" size="1">
+      <Value key="0" z="-150" />
+    </Data>
+    <Data name="pPlace" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="bPick" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="nX" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nY" access="private" xsi:type="array" type="num" size="1" />
+  </Datas>
+</Database>

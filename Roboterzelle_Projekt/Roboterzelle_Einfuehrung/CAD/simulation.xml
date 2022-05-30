@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Simulation>
+  <Part Id="71149ce6-9500-4a61-adfe-082e2580a482">
+    <InitialPosition X="601.55951712362412" Y="-121.76877300330881" Z="740.92268545214029" Rx="-179.99999999999966" Ry="-4.9125424246798017E-14" Rz="44.999999999999979" />
+  </Part>
+  <Part Id="c863cc06-2fec-4dd0-904a-8946db4d936e">
+    <InitialPosition X="601.75325250740525" Y="-221.76845167684542" Z="741.08618404689662" Rx="-179.99999999999974" Ry="-6.5097525771562966E-13" Rz="44.999999999999588" />
+  </Part>
+  <Part Id="d309f8cb-ae19-48cc-953a-4cbf6cfcfe46">
+    <InitialPosition X="601.3657817398431" Y="-21.769094329772059" Z="740.75918685738361" Rx="-179.99999999999974" Ry="-7.2620648689908558E-13" Rz="44.999999999999517" />
+  </Part>
+  <Part Id="c779b295-62b6-41bf-bd0f-c3d19a5c9cf7">
+    <InitialPosition X="601.55951712362423" Y="-121.76877300330877" Z="740.92268545214017" Rx="179.90529700000002" Ry="-0.52904999999999525" Rz="-45.1110070000001" />
+  </Part>
+  <Part Id="23645574-5238-44c2-842e-5ec0530cba89">
+    <InitialPosition X="601.172046356062" Y="78.230584343764519" Z="740.59568826262728" Rx="179.90529700000002" Ry="-0.52904999999999525" Rz="-45.111006999999987" />
+  </Part>
+  <Behavior Id="6a2883f0-fc0a-4d45-af5d-71a7441cdf4e" InitialState="a4dcbf3e-1890-4254-a4ed-db359209d1f2">
+    <State Id="a4dcbf3e-1890-4254-a4ed-db359209d1f2" Name="opened" Trigger="CS9\ValveIO\valve1" TriggerCondition="On" />
+    <State Id="78af5543-0f99-442c-9714-321c9446b2ba" Name="closed" Trigger="CS9\ValveIO\valve1" />
+    <Transition From="a4dcbf3e-1890-4254-a4ed-db359209d1f2" To="78af5543-0f99-442c-9714-321c9446b2ba" FromToDuration="PT0S" ToFromDuration="PT0S" />
+    <Handler Id="e7b22a9e-d538-4973-86c7-f5373a0e693c" GraspStateId="78af5543-0f99-442c-9714-321c9446b2ba" />
+  </Behavior>
+</Simulation>
