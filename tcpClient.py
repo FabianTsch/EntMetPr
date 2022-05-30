@@ -41,7 +41,6 @@ def tcp_communication(type, orientation,x,y,phi):
         Error:         0 = no error, 1 = error
                 
      """
-    error = False
 
     for i in range(len(x)):
         # put data in array for sending
@@ -56,13 +55,4 @@ def tcp_communication(type, orientation,x,y,phi):
         
     print('Done!')
 
-    # error handling
-    if error:
-        return 1    
-
     return 0
-
-# ---------------------------------------------------
-# main
-
-#tcp_communication(1,1,1,1,1)
