@@ -37,7 +37,7 @@ def calc_orientation(mu):
     J = np.array([[a, c],[c, b]])
     ew,ev = np.linalg.eig(J)
     
-    alpha = np.round(atan2(ev[0,1],ev[1,1])*180/pi-90 +360   ,1)           
+    alpha = np.round(atan2(ev[0,1],ev[1,1])*180/pi +360, 1)           
 
     return alpha
 
