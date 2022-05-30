@@ -176,4 +176,4 @@ def object_detection(img):
     for i in range(0,len(mp)):
             img_array[i] = cv2.cvtColor(mp[i],cv2.COLOR_BGR2RGB)  
 
-    return img_array, obj[:,0:2],mo
+    return img_array, obj[:,0], obj[:,1], mo
