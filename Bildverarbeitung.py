@@ -237,21 +237,8 @@ def object_detection(img):
     # contour filter
     contour_points = np.array([], dtype=int)
     obj = []
-    for i in range(len(contours)):       
-        area = cv2.contourArea(contours[i])
-
-        if area > 100:                   # Fläche Überprüfen
-            x,y,w,h = cv2.boundingRect(contours[i]) 
-            if 0< x < IMAGE_WIDTH and 0< y < IMAGE_HIGHT:                # Position Überprüfen
-                obj_buffer = np.array([x,y,w,h]) 
-                contour_points = np.append(contour_points,[i] )  
-                obj = np.append(obj,obj_buffer)
-
-    contour_points = contour_points[0:len(contour_points)]  
-    contour_points = contour_points.astype(int)
-    
-    obj = np.resize(obj,(len(contour_points),4))   
-    obj = obj.astype(int)
+    obj, orientation, contours = find_objects(contours,img)
+    contour_points = range(0,len(contours))
 
     # Get the moments
     mu = [None]*len(contour_points)
@@ -282,4 +269,6 @@ def object_detection(img):
     for i in range(0,len(mp)):
             img_array[i] = cv2.cvtColor(mp[i],cv2.COLOR_BGR2RGB)  
 
-    return img_array, obj[:,0], obj[:,1], mo
+    # Make List of Array to 2D Array
+    obj = np.vstack(obj)
+    return img_array, obj[:,0], obj[:,1], mo, orientation

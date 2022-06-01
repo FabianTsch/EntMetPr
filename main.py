@@ -24,10 +24,7 @@ img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 
 img = bv.homography(img)
 
-# TODO: add orientation
-img_array, x, y, angle = bv.object_detection(img)
-orientation = np.full(len(angle),2) # Alle liegend
-
+img_array, x, y, angle, orientation = bv.object_detection(img)
 # TODO: break when liste is empty
 
 obj_class = oc.execute(img_array)
