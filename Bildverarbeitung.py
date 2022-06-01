@@ -16,12 +16,12 @@ IMAGE_HIGHT = 500
 def calc_angle(mu):
     """ calc angle through given moment
         Params
-         --------
+        --------
          mu:   Moments of the Contour                                 
 
         Returns
         --------
-        apha: Main Dircetion of the contour
+         alpha: angle
             
     """
 
@@ -169,6 +169,17 @@ def crop_image(img, obj):
     return image
 
 def create_mask(img, target):
+    """ creats a opencv mask of a img depending on the given target
+        Params
+        --------
+         img: picture as BGR  
+         target: defined target for mask
+
+        Returns
+        --------
+         mask
+            
+    """
     if target == TARGET_HOMOGRAPHY_POINTS:
         lower = np.array([40,80,80]) 
         upper = np.array([86,230,230]) 
@@ -181,6 +192,16 @@ def create_mask(img, target):
 
 
 def homography(img):
+    """ searches for source points and executes homography
+        Params
+        --------
+         img: image for homography
+
+        Returns
+        --------
+         image: reformed image
+            
+    """
     mask = create_mask(img,target=TARGET_HOMOGRAPHY_POINTS)
 
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
@@ -231,6 +252,20 @@ def homography(img):
 
 
 def object_detection(img):
+    """ detects object in given img
+        and return object information and mini picture
+        of object
+        Params
+        --------
+         img: image including the objects
+
+        Returns
+        --------
+         image_array: mini pictures of found objects 
+         x,y: coordinates of found object
+         orientation: standing or lying
+            
+    """
     mask = create_mask(img,target=TARGET_OBJECTS)
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
