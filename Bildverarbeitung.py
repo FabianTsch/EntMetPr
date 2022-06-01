@@ -41,6 +41,21 @@ def calc_orientation(mu):
 
     return alpha
 
+def plot_contour(img,contour):
+    """ debug function to plot contours 
+        Params
+        --------
+         img: 3D RGB array
+         contour: contour for plotting
+
+        Returns
+        --------
+    """
+
+    image_contour = cv2.drawContours(img,contour,-1,(0,255,0),1)
+    cv2.imshow("singel contour",image_contour)
+    cv2.waitKey(0)
+
 def calc_aoi(a,b,c,d):
     """ calculates area of intersection
         Params
