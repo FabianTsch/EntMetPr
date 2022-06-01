@@ -41,6 +41,26 @@ def calc_orientation(mu):
 
     return alpha
 
+def calc_aoi(a,b,c,d):
+    """ calculates area of intersection
+        Params
+        --------
+         a,b: corners of the first rectangle 
+         c,d: corners of the second rectangle
+        Returns
+        --------
+         aoi: area of intersection 
+    """
+    x, y = 0, 1
+    width = min(b[x], d[x]) - max(a[x],c[x])
+    height = min(b[y],d[y]) - max(a[y],c[y])
+
+    if min(width, height) > 0: 
+        return width * height
+    else: 
+        return 0
+
+
 def crop_image(img, obj):
     """ Cut the given img around the given objectsize and the center of mass with some overhang
         Params
