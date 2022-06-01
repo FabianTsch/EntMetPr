@@ -76,6 +76,77 @@ def calc_aoi(a,b,c,d):
         return 0
 
 
+def find_objects(contoursg,img):
+    """ finds object in given contour and detects
+        if the obj is standing of lying
+        Params
+        --------
+         contours: contours found in the img
+         img: just for debugging
+        Returns
+        --------
+         obj: found objects
+         orientation: standing or lying
+         contour_buffer: contour corresponding to the obj
+    """
+    obj = []
+    orientation = []
+    contour_buffer = []
+    boundRect = [None]*len(contours)
+    area_min = 100
+    valid_area = (621,500)
+
+    # condition lying
+    area_lying = (1100,4000)
+    area_overlapping_threshold = 0.9
+
+    # get relevant contours
+    for i in range(0, len(contours)):
+        area = cv2.contourArea(contours[i])
+        x,y,w,h = cv2.boundingRect(contours[i]) 
+        if area > area_min and 0< x < valid_area[0] and 0< y < valid_area[1]:
+            contour_buffer.append(contours[i])
+
+    contour = contour_buffer
+    contour_buffer = []
+
+    # check standing or lying
+    for i in range(0,len(contour)):
+        x,y,w,h = cv2.boundingRect(contour[i])
+        boundRect = cv2.boundingRect(contour[i])
+        x2,y2,w2,h2 = cv2.boundingRect(contour[i-1])
+        area = h * w
+        a = [x,y]
+        b = [x+w,y+h]
+        c = [x2,y2]
+        d = [x2+w2,y2+h2]
+        aoi = calc_aoi(a,b,c,d)
+
+        if area_lying[0] < area < area_lying[1]:
+            obj.append(np.array([x,y,w,h]))
+            orientation.append(2)
+            contour_buffer.append(contour[i])
+        elif aoi / area > area_overlapping_threshold:
+
+            if w*h <= w2*h2:
+                obj.append(np.array([x,y,w,h]))
+                contour_buffer.append(contour[i])
+                orientation.pop(-1)
+                obj.pop(-1)
+                contour_buffer.pop(-1)
+            else:
+                pass
+            # TODO: Scenario abdecken, wenn inner Mutterfläche 
+            # vor äußeren auftritt (scheint nie vorzukommen)
+
+            orientation.append(2)
+        else:
+            obj.append(np.array([x,y,w,h]))
+            contour_buffer.append(contour[i])
+            orientation.append(1)
+    return obj, orientation, contour_buffer
+
+
 def crop_image(img, obj):
     """ Cut the given img around the given objectsize and the center of mass with some overhang
         Params
