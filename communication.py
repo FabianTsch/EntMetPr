@@ -425,8 +425,10 @@ def move(type, orientation,x, y, angle, orig, img):
     if np.size(x) == 1:
 
         alpha = angle + 90
+        x_m = x
+        y_m = y
 
-        while pick(1,2,x,y,alpha,img,True):
+        while pick(1,2,x,y,alpha[0],img,True):
             x_m -= np.cos(np.deg2rad(m_alpha)) * 1
             y_m -= np.sin(np.deg2rad(m_alpha)) * 1
         return 3, 1, x_m,y_m,alpha, 0
@@ -627,6 +629,3 @@ def test():
     a_type, a_orientation, a_x, a_y, a_angle, error = move(type, orientation,x, y, angle, [750,500], img)
     print('Angle: ', a_angle)
     print(' x: ', a_x,' y:', a_y )
-
-
-test()
