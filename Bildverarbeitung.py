@@ -13,8 +13,8 @@ IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
 
 
-def calc_orientation(mu):
-    """Finds the main Orientation of the given Contour
+def calc_angle(mu):
+    """ calc angle through given moment
         Params
          --------
          mu:   Moments of the Contour                                 
@@ -269,7 +269,7 @@ def object_detection(img):
     # Get the orientation
     mo = [None]*len(contour_points)
     for i in range(len(contour_points)):   
-        mo[i] = calc_orientation(mu[i])
+        mo[i] = calc_angle(mu[i])
     mo = np.asarray(mo)
 
     # Get mini Pictures of each obj
