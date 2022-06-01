@@ -76,7 +76,7 @@ def calc_aoi(a,b,c,d):
         return 0
 
 
-def find_objects(contoursg,img):
+def find_objects(contours,img):
     """ finds object in given contour and detects
         if the obj is standing of lying
         Params
