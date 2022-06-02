@@ -74,9 +74,7 @@ def createObj(obj_type, orientation,x,y,angle, orig, tool=False,move=False, work
     if tool and not move:
         obj[:,2*s:width-2*s] = 0
 
-    
-
-        
+            
     
     # Rotate the img
     w = int(np.sqrt(np.square(height)+np.square(width)))                        # new size of the img
@@ -436,10 +434,10 @@ def move(obj_type, orientation,x, y, angle, orig, img):
 
     # check if their are more than one group
     if np.size(x) == 1:
-
+        
         alpha = angle + 90
-        x_m = x
-        y_m = y
+        x_m = x            
+        y_m = y 
 
         while pick(1,2,x,y,alpha[0],img,True):
             x_m -= np.cos(np.deg2rad(m_alpha)) * 1
@@ -633,6 +631,9 @@ def test():
 
 def test2():
     # %%
+    y_max = 500
+    x_max = 750
+    
     obj_class = [2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 2, 1, 1, 2, 2]
     orientation = [1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 1, 1, 1, 1, 1]
     x = [345, 256, 144,  71, 449, 163, 347,  84, 263, 406, 251, 430, 138, 324, 339, 498, 495]
@@ -660,21 +661,28 @@ def test2():
     print(' x: ', a_x,' y:', a_y )
 
 
+   
+    
     img_text =  img
+    # Flip the img upside down for better interpretation
+    img_text = cv2.flip(img_text, 0)   
     img_text = img_text.astype(np.float32)*255    
     img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
     font = cv2.FONT_HERSHEY_SIMPLEX
     for i in range(0,np.size(m_x)):
-        i = int(i)        
-        img_text = cv2.circle(img_text,(int(a_x[i]),int(a_y[i])),3,(0,255,0),5)
-        print(a_x[i])
-        print(i)        
-        cv2.putText(img_text, str(i),(int(m_x[i]),int(m_y[i])), font,1, (0, 0, 255), 2)
-        
-    #print('m_x: ', m_x)
-    #print('a_x', a_x)
-    cv2.imshow('Gruppen', img_text)
+        i = int(i)   
+        img_text = cv2.line(img_text, (int(a_x[i]),y_max-int(a_y[i])), (int(m_x[i]), y_max-int(m_y[i])), (0,255, 0), thickness=1)     
+        cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]),y_max-int(a_y[i])), font, 0.5, (0, 255, 0), 2)                      
+              
+        cv2.putText(img_text, str(i),(int(m_x[i]),y_max-int(m_y[i])), font,1, (0, 0, 255), 2)
+    
+    #cv2.imshow('Gruppen', img_text)
+    #img_text = cv2.flip(img_text, 0)   
+    
+    cv2.imshow('Gruppen- gespiegelt', img_text)
     cv2.waitKey()
+
+
     
 
 # %%
