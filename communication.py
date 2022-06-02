@@ -453,12 +453,12 @@ def move(obj_type, orientation,x, y, angle, orig, img):
     
     
     # Corrects unwanted angles
-    for i in range (0,np.size(x)):
-        if angle[i] < 0:
-            angle[i] += 360
+    #for i in range (0,np.size(x)):
+     #   if angle[i] < 0:
+      #      angle[i] += 360
 
-        if angle[i] > 180:
-            angle[i] -=180
+       # if angle[i] > 180:
+        #    angle[i] -=180
 
     # find nearts group    
     for count in range (0,np.size(x)):        
@@ -480,10 +480,11 @@ def move(obj_type, orientation,x, y, angle, orig, img):
         # check if this position is reachable      
         x_m = r*np.cos(m_alpha)/2 + x[count]
         y_m = r*np.sin(m_alpha)/2 + y[count] 
-        m_alpha = m_alpha*180/np.pi+180
+        m_alpha = m_alpha*180/np.pi
         while not pick(1,2,x_m,y_m,m_alpha,img,True):  # if alpha is not poissible --> rotate alpha 
             m_alpha += 5    
             z += 5
+            print('+z')
             if z > 360:
                 print('Error --> keine erreichbare Position gefunden')
                 error[count] = 1
@@ -491,10 +492,15 @@ def move(obj_type, orientation,x, y, angle, orig, img):
         
         # find the distance to the obj make steps of 1 mm
         while pick(1,2,x_m,y_m,m_alpha,img,True):
-            x_m += np.cos(np.deg2rad(m_alpha)) * 1
-            y_m += np.sin(np.deg2rad(m_alpha)) * 1
+            x_m -= np.cos(np.deg2rad(m_alpha)) * 1
+            y_m -= np.sin(np.deg2rad(m_alpha)) * 1
             
-          
+        if m_alpha <0:
+            m_alpha = abs(m_alpha)+180
+        else:
+            m_alpha = 180-m_alpha
+
+
         alpha[count] = m_alpha
         m_x[count] = int(x_m)
         m_y[count] = int(y_m)
@@ -665,16 +671,16 @@ def test2():
     
     img_text =  img
     # Flip the img upside down for better interpretation
-    img_text = cv2.flip(img_text, 0)   
+    #img_text = cv2.flip(img_text, 0)   
     img_text = img_text.astype(np.float32)*255    
     img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
     font = cv2.FONT_HERSHEY_SIMPLEX
     for i in range(0,np.size(m_x)):
         i = int(i)   
-        img_text = cv2.line(img_text, (int(a_x[i]),y_max-int(a_y[i])), (int(m_x[i]), y_max-int(m_y[i])), (0,255, 0), thickness=1)     
-        cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]),y_max-int(a_y[i])), font, 0.5, (0, 255, 0), 2)                      
+        img_text = cv2.line(img_text, (int(a_x[i]),int(a_y[i])), (int(m_x[i]), int(m_y[i])), (0,255, 0), thickness=1)     
+        cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]),int(a_y[i])), font, 0.5, (0, 255, 0), 2)                      
               
-        cv2.putText(img_text, str(i),(int(m_x[i]),y_max-int(m_y[i])), font,1, (0, 0, 255), 2)
+        cv2.putText(img_text, str(i),(int(m_x[i]),int(m_y[i])), font,1, (0, 0, 255), 2)
     
     #cv2.imshow('Gruppen', img_text)
     #img_text = cv2.flip(img_text, 0)   
@@ -686,4 +692,4 @@ def test2():
     
 
 # %%
-test2()
+#test2()
