@@ -97,7 +97,7 @@ def find_objects(contours,img):
     valid_area = (621,500)
 
     # condition lying
-    area_lying = (1100,4000)
+    area_lying = (700,4000)
     area_overlapping_threshold = 0.9
 
     # get relevant contours
