@@ -23,6 +23,7 @@ print("Start Loop")
 img = camera.execute("Kamerabilder/TX2_SM_kontakt.png")
 
 img = bv.homography(img)
+cv2.imshow('Orginalbild', img)
 
 img_array, x, y, angle, orientation = bv.object_detection(img)
 # TODO: break when liste is empty
