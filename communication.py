@@ -8,12 +8,11 @@ Communication: Filters the array of object checks for collisions
 """
 
 # %%
-from turtle import width
 import cv2
 import numpy as np
-from torch import threshold
 
 plot = False
+debug = True
 
 
 
@@ -267,7 +266,7 @@ def nearObj(x,y,x1,y1):
     if distance < threshold:
         near = True
     
-    print(near)
+    #print(near)
     return near
 
 def createSubGroup(obj_type, orientation,x,y,angle, area=0):
@@ -316,7 +315,7 @@ def createSubGroup(obj_type, orientation,x,y,angle, area=0):
     # creat group 
        
     for i in range(0,np.size(x)):
-        print('************************* i:',i)
+        #print('************************* i:',i)
         
         for j in range(0,np.size(x)):
             
@@ -348,9 +347,9 @@ def createSubGroup(obj_type, orientation,x,y,angle, area=0):
                 g_angle = np.append(g_angle, angle[i]) 
                 g_area = np.append(g_area, surface[i])
 
-    print('type ', g_type)
-    print('g_j:',g_j)
-    print('Ende creatGroup')
+    #print('type ', g_type)
+    #print('g_j:',g_j)
+    #print('Ende creatGroup')
     return g_x, g_y, g_angle, g_area
 
 def createGroup(obj_type, orientation,x,y,angle,j):
@@ -380,7 +379,8 @@ def createGroup(obj_type, orientation,x,y,angle,j):
     m_y = []
     m_angle = []
     
-    print('Creat Group')
+
+    #print('Creat Group')
     # creat a list with obj that can not be picked
     for i in range(0,np.size(obj_type)):
 
@@ -397,20 +397,20 @@ def createGroup(obj_type, orientation,x,y,angle,j):
     m_x, m_y, m_angle, m_area = createSubGroup(m_type,m_orientation,m_x,m_y,m_angle)   
     
     # other loops
-    for i in range(0,np.size(obj_type)):
-        print('####################### Runde :', i)
-        m_x, m_y, m_angle, m_area = createSubGroup(m_type,m_orientation,m_x,m_y,m_angle,m_area)
+    if not np.size(m_x)==1:
+        for i in range(0,np.size(obj_type)):
+            if plot:
+                print('####################### Runde :', i)
+            m_x, m_y, m_angle, m_area = createSubGroup(m_type,m_orientation,m_x,m_y,m_angle,m_area)
         
-        
-    
-    print('m_x  ',m_x) 
-    
+     
     
     m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
     
     if plot:
         print('Area:', m_area)
         print('Ende Fkt')
+    
     return m_type, m_orientation, m_x, m_y, m_angle
  
 def move(obj_type, orientation,x, y, angle, orig, img):
@@ -435,31 +435,25 @@ def move(obj_type, orientation,x, y, angle, orig, img):
     # check if their are more than one group
     if np.size(x) == 1:
         
-        alpha = angle + 90
-        x_m = x            
-        y_m = y 
+        alpha = angle
+        m_x = x   
+        m_y = y
+        
 
-        while pick(1,2,x,y,alpha[0],img,True):
-            x_m -= np.cos(np.deg2rad(m_alpha)) * 1
-            y_m -= np.sin(np.deg2rad(m_alpha)) * 1
-        return 3, 1, x_m,y_m,alpha, 0
+        while not pick(1,2,x,y,alpha[0],img,True):           
+            m_x -= np.cos(np.deg2rad(alpha)) * 1
+            m_y -= np.sin(np.deg2rad(alpha)) * 1
+           
+        return 3, 1, m_x,m_y,alpha, 0
+
 
     # important variables
     threshold = np.inf
     alpha = np.zeros(np.size(x))
     error = np.zeros(np.size(x))
     m_x = np.zeros(np.size(x))
-    m_y = np.zeros(np.size(x))
-    
-    
-    # Corrects unwanted angles
-    #for i in range (0,np.size(x)):
-     #   if angle[i] < 0:
-      #      angle[i] += 360
-
-       # if angle[i] > 180:
-        #    angle[i] -=180
-
+    m_y = np.zeros(np.size(x))    
+   
     # find nearts group    
     for count in range (0,np.size(x)):        
         r = 0
@@ -545,17 +539,42 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     # First Part -  check pick
     j, img = checkPick(obj_type, orientation,x,y,angle,orig)
 
+    if debug:
+        img_text = createImg(obj_type, orientation,x,y,angle, [750,500])
+        img_text = img_text.astype(np.float32)*255    
+        img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
+        
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        for i in j:
+            i = int(i)
+            cv2.putText(img_text, str(i),(x[i],y[i]), font,
+                            1, (0, 0, 255), 2)
+        cv2.imshow('alle Objekte', img_text)
+
     if plot:
         cv2.imshow('alle Gruppen', img)
         cv2.waitKey()
         
     # Second Part -  Creat Groups
     m_type, m_orientation, m_x, m_y, m_angle = createGroup(obj_type, orientation,x,y,angle,j)
-    
-    
+        
     # Third Part Find attack angle
-    a_type, a_orientation, a_x, a_y, a_angle, error = move(m_type, m_orientation,m_x, m_y, m_angle, orig, img)
-
+    a_type, a_orientation, a_x, a_y, a_angle, error = move(m_type, m_orientation,m_x.copy(), m_y.copy(), m_angle.copy(), orig, img)
+   
+    if debug:
+        img_text =  img        
+        img_text = img_text.astype(np.float32)*255    
+        img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        for i in range(0,np.size(m_x)):
+            i = int(i)   
+            img_text = cv2.line(img_text, (int(a_x[i]),int(a_y[i])), (int(m_x[i]), int(m_y[i])), (0,255, 0), thickness=2)     
+            cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]),int(a_y[i])), font, 0.5, (0, 255, 0), 2)                      
+                
+            cv2.putText(img_text, str(i),(int(m_x[i]),int(m_y[i])), font,1, (0, 0, 255), 2)
+                
+        cv2.imshow('Gruppen', img_text)
+        cv2.waitKey()
     # Fouth Part - Creat list
     for i in range(0,np.size(j)):
         r_type = np.append(r_type, obj_type[int(j[i])])
