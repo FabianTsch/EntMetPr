@@ -120,9 +120,9 @@ def find_objects(contours,img):
         b = [x+w,y+h]
         c = [x2,y2]
         d = [x2+w2,y2+h2]
+        diagonale = (w**2+h**2)**0.5
         aoi = calc_aoi(a,b,c,d)
-
-        if area_lying[0] < area < area_lying[1]:
+        if area_lying[0] < area < area_lying[1] and diagonale > 55:
             obj.append(np.array([x,y,w,h]))
             orientation.append(2)
             contour_buffer.append(contour[i])
