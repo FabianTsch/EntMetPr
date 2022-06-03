@@ -341,7 +341,7 @@ def createSubGroup(obj_type, orientation,x,y,angle, area=0):
         for i in g_j:
             i = int(i)
             if not int(g_type[i]) == 3:
-                print('attach',i)            
+                #print('attach',i)            
                 g_x = np.append(g_x, x[i] )  
                 g_y = np.append(g_y, y[i] ) 
                 g_angle = np.append(g_angle, angle[i]) 
