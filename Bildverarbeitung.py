@@ -49,7 +49,11 @@ def plot_contour(img,contour):
         --------
     """
 
+    rect = cv2.minAreaRect(contour)
+    rect_points = cv2.boxPoints(rect)
+    rect_points = np.intp(rect_points)
     image_contour = cv2.drawContours(img,contour,-1,(0,255,0),1)
+    image_contour = cv2.drawContours(image_contour,[rect_points],0,(255,0,0))
     cv2.imshow("singel contour",image_contour)
     cv2.waitKey(0)
 
