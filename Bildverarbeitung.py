@@ -290,10 +290,11 @@ def object_detection(img):
     mc = mc.astype(int)
     
     # Get the angle
-    mo = [None]*len(contour_points)
+    angle = [None]*len(contour_points)
     for i in range(len(contour_points)):   
-        mo[i] = calc_angle(contours[i])
-    mo = np.asarray(mo)
+        angle[i] = calc_angle(contours[i])
+    angle = np.asarray(angle)
+
 
     # Get mini Pictures of each obj
     mp = [None]*len(contour_points)
@@ -307,4 +308,4 @@ def object_detection(img):
 
     # Make List of Array to 2D Array
     obj = np.vstack(obj)
-    return img_array, obj[:,0], obj[:,1], mo, orientation
+    return img_array, obj[:,0], obj[:,1], angle, orientation
