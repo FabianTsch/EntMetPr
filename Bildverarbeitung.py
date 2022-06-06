@@ -13,33 +13,30 @@ IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
 
 
-def calc_angle(mu):
+def calc_angle(contour):
     """ calc angle through given moment
         Params
         --------
-         mu:   Moments of the Contour                                 
+         contour: contour of the object
 
         Returns
         --------
-         alpha: angle
+         angle: angle of the object
             
     """
+    rect = cv2.minAreaRect(contour)
+    (x,y),(w,h),angle = rect
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
 
-    x = int(mu["m10"] / mu["m00"])
-    y = int(mu["m01"] / mu["m00"])
-    center = (x,y)
-    
-    a = int(mu["m20"] - mu["m10"]*mu["m10"]/mu["m00"])
-    b = int(mu["m02"] - mu["m01"]*mu["m01"]/mu["m00"])
-    c = int(mu["m11"] - mu["m10"]*mu["m01"]/mu["m00"])
-    
-    
-    J = np.array([[a, c],[c, b]])
-    ew,ev = np.linalg.eig(J)
-    
-    alpha = np.round(atan2(ev[0,1],ev[1,1])*180/pi +360, 1)           
+    used_edge = max(w,h)
+    x_p = box[0,0] - box[1,0]
+    y_p = box[0,1] - box[1,1]
+    lenght_p = (x_p**2+y_p**2)**0.5
+    if used_edge > lenght_p+2:
+        angle = (angle+90)-180
 
-    return alpha
+    return -angle
 
 def plot_contour(img,contour):
     """ debug function to plot contours 
@@ -100,7 +97,7 @@ def find_objects(contours,img):
     area_lying = (700,4000)
     area_overlapping_threshold = 0.9
 
-    # get relevant contours
+    # compare min area to be valid contour
     for i in range(0, len(contours)):
         area = cv2.contourArea(contours[i])
         x,y,w,h = cv2.boundingRect(contours[i]) 
@@ -288,10 +285,10 @@ def object_detection(img):
     mc = np.asarray(mc)   # Konvertierung in ein Array        
     mc = mc.astype(int)
     
-    # Get the orientation
+    # Get the angle
     mo = [None]*len(contour_points)
     for i in range(len(contour_points)):   
-        mo[i] = calc_angle(mu[i])
+        mo[i] = calc_angle(contours[i])
     mo = np.asarray(mo)
 
     # Get mini Pictures of each obj
