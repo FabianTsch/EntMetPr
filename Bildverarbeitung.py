@@ -113,6 +113,7 @@ def find_objects(contours,img):
 
     # check standing or lying
     for i in range(0,len(contour)):
+        (x_min,y_min),(w_min,h_min),angle = cv2.minAreaRect(contour[i])
         x,y,w,h = cv2.boundingRect(contour[i])
         boundRect = cv2.boundingRect(contour[i])
         x2,y2,w2,h2 = cv2.boundingRect(contour[i-1])
@@ -121,9 +122,8 @@ def find_objects(contours,img):
         b = [x+w,y+h]
         c = [x2,y2]
         d = [x2+w2,y2+h2]
-        diagonale = (w**2+h**2)**0.5
         aoi = calc_aoi(a,b,c,d)
-        if area_lying[0] < area < area_lying[1] and diagonale > 55:
+        if area_lying[0] < area < area_lying[1] and not 0.4 < w_min/h_min < 2:
             obj.append(np.array([x,y,w,h]))
             orientation.append(2)
             contour_buffer.append(contour[i])
