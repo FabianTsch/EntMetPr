@@ -188,8 +188,23 @@ def create_mask(img, target):
         return cv2.inRange(hsv, lower, upper) 
         
     elif target == TARGET_OBJECTS:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        return cv2.inRange(gray, 130, 255)
+        # pick space in rbg color space
+        lower = np.array([0,90,100]) 
+        upper = np.array([255,255,255]) 
+        rgb = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+        mask_rgb = cv2.inRange(rgb, lower, upper)
+
+        # remove borders overlapping
+        mask = np.zeros(mask_rgb.shape,np.uint8)
+        mask[7:-7,7:-125] = mask_rgb[7:-7,7:-125] 
+        cv2.imshow("before closing",mask)
+
+        # erosion
+        kernel_erode = np.ones((2,2),np.uint8)
+        mask = cv2.erode(mask,kernel_erode,iterations=1)
+
+        cv2.imshow("mask",mask)
+        return mask
 
 
 def homography(img):
