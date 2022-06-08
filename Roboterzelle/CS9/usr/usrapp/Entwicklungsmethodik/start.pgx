@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="start">
+    <Code><![CDATA[begin
+  
+  clearBuffer(soTcpClient)
+  movej(jHome,tGreiferM,mUsedSpeed)
+    
+ 
+  taskCreate "TCP-Server", 10, TCPserver()
+  
+  taskCreate "p&p", 5, PickPlace()
+  
+  taskCreate "Vereinzeln", 5, Vereinzeln()
+  
+   
+  
+  movej(jHome,tGreiferM,mUsedSpeed)
+  waitEndMove()
+ 
+end]]></Code>
+  </Program>
+</Programs>

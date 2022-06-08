@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<IoMap>
+    <!--  To activate a io mapping, fill the value  with the physical I/O link  -->
+    <!--  then reboot. Correct / incorrect mappings are listed in the event logger.  -->
+    <!--  The physical link can be copied/pasted from the physical IO tool of VAL3 Studio   -->
+
+    <!-- Here are some signals examples that can be used -->
+    <!-- TODO -->
+
+    <!--  CONFIGURATION OF SYSTEM INPUTS  -->
+    <!-- enablePower - digital input - enable power in remote mode -->
+    <String name="enablePower" value="" />
+    <!-- remoteMonitorSpeed - analog input ]0,+100] - replace the -/+ keys of the MCP (only when MCP is replaced with a dummy plug) -->
+    <String name="remoteMonitorSpeed" value="" />
+    <!-- remoteMoveHold - digital input - replace the Move/Hold button of the MCP (only when MCP is replaced with a dummy plug) -->
+    <String name="remoteMoveHold" value="" />
+    <!-- safetyRestart - digital input - restart the safety -->
+    <String name="safetyRestart" value="" />
+    <!-- reducedSafety - digital input - activate the reduced safety -->
+    <String name="reducedSafety" value="" />
+
+    <!-- popup - serial output - transmit popup messages -->
+    <String name="popup" value="" />
+    <!-- power - digital output - status of arm power -->
+    <String name="power" value="" />
+    <!-- fastSpeed - digital output - status of the fast speed mode in test working mode -->
+    <String name="fastSpeed" value="" />
+    <!-- dummyPlug - digital output - presence of the dummy plug in replacement of the MCP -->
+    <String name="dummyPlug" value="" />
+    <!-- monitorSpeed - analog output ]0,+1] - value of current monitor speed -->
+    <String name="monitorSpeed" value="" />
+    <!-- workingMode - analog output {0 (invalid), 1 (manual) , 2 (test), 3 (local), 4 (remote)} - current working mode -->
+    <String name="workingMode" value="" />
+    <!-- jogMode - analog output {0 (disabled), 1 (joint) , 2 (frame), 3 (tool), 4 (move), 5 (connect)} - current jog mode -->
+    <String name="jogMode" value="" />
+    <!-- deadman - digital output - status of the deadman/enabling device -->
+    <String name="deadman" value="" />
+    <!-- moveHold - digital output - status of the motion (on when moving, off when on hold) -->
+    <String name="moveHold" value="" />
+
+    <!-- REMOTE MCP OPTION  -->  
+    <!-- remoteEnablePower= digital input - replace the Power button of the MCP -->
+    <String name="remoteEnablePower" value="" />
+    <!-- remoteTestMode = digital input - switch to Test mode (only with 'remote Mcp' option) -->
+    <String name="remoteTestMode" value="" />
+    <!-- remoteManualMode = digital input - switch to Manual mode (only with 'remote Mcp' option) -->
+    <String name="remoteManualMode" value="" />
+    <!-- remoteLocalMode = digital input - switch to Local mode (only with 'remote Mcp' option) -->
+    <String name="remoteLocalMode" value="" />
+    <!-- remoteRemoteMode = digital input - switch to Remote mode (only with 'remote Mcp' option) -->
+    <String name="remoteRemoteMode" value="" />
+    <!-- remoteJogJointMode = digital input - replace the Joint button of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogJointMode" value="" />
+    <!-- remoteJogFrameMode = digital input - replace the Frame button of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogFrameMode" value="" />
+    <!-- remoteJogToolMode = digital input - replace the Tool button of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogToolMode" value="" />
+    <!-- remoteJogUserMode = digital input - replace the Point button of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogUserMode" value="" />
+    <!-- remoteJogMove1 = analog input [-100,+100] - replace the X -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove1" value="" />
+    <!-- remoteJogMove2 = analog input [-100,+100] - replace the Y -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove2" value="" />
+    <!-- remoteJogMove3 = analog input [-100,+100] - replace the Z -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove3" value="" />
+    <!-- remoteJogMove4 = analog input [-100,+100] - replace the RX -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove4" value="" />
+    <!-- remoteJogMove5 = analog input [-100,+100] - replace the RY -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove5" value="" />
+    <!-- remoteJogMove6 = analog input [-100,+100] - replace the RZ -/+ buttons of the MCP (only with 'remote Mcp' option) -->
+    <String name="remoteJogMove6" value="" />
+    <!-- remoteSpeedLimit = digital input - increase the max. Cartesian speed in fast test mode (only with 'remote Mcp' option) -->
+    <String name="remoteSpeedLimit" value="" />
+</IoMap>

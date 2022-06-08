@@ -42,7 +42,7 @@ def tcp_communication(type, orientation,x,y,phi):
 
     for i in range(len(x)):
         # put data in array for sending
-        data=struct.pack('ddddd',type[i],orientation[i],x[i] ,y[i], phi[i])
+        data=struct.pack('ddddd',type[i],orientation[i],x[i] ,y[i], -phi[i])
         # send Data
         sock.sendall(data)
         

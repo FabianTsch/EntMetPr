@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://www.staubli.com/robotics/VAL3/Project/3">
+  <Parameters version="s8.3.1Cs9_BS885" stackSize="100000" millimeterUnit="true" />
+  <Programs>
+    <Program file="pick.pgx" />
+    <Program file="PickPlace.pgx" />
+    <Program file="place.pgx" />
+    <Program file="start.pgx" />
+    <Program file="stop.pgx" />
+    <Program file="TCPserver.pgx" />
+    <Program file="Vereinzeln.pgx" />
+  </Programs>
+  <Database>
+    <Data file="Entwicklungsmethodik.dtx" />
+  </Database>
+  <Libraries />
+</Project>

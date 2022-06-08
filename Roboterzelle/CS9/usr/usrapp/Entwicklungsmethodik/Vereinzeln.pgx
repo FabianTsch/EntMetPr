@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="Vereinzeln">
+    <Locals>
+      <Local name="mDesc" type="mdesc" xsi:type="array" size="1" />
+    </Locals>
+    <Code><![CDATA[begin
+
+  
+  while true
+    
+    // Vereinzelt die Objekte
+       
+    
+    wait(bNewData)
+    
+    // Wenn wir nicht vereinzeln heben wir Obj auf und setzen diese ab
+    if bVereinzeln 
+      logMsg("Vereinzeln startet ")
+     
+      pVereinzeln.trsf.x = nX
+      pVereinzeln.trsf.y = nY
+      pVereinzeln.trsf.rz = nAngle
+      
+           
+      logMsg("nAngle ****************** " + toString("0.4", nAngle))
+      logMsg("nData ****************** " + toString("0.4", nData[4] ))
+      close(tGreiferM)
+      // Fahre über Punkt Vereinzeln --> irgenwie
+      movej(appro(pVereinzeln, trApro), tGreiferM, mUsedSpeed)      
+         
+       
+      movej(pVereinzeln, tGreiferM, mVereinzeln)
+      
+      // Fahre linear trVer voraus
+      pVereinzeln.trsf.x =  pVereinzeln.trsf.x +  100 * cos(-nData[4])
+      pVereinzeln.trsf.y =  pVereinzeln.trsf.y +  100 * sin(-nData[4])
+      
+      movej(pVereinzeln,tGreiferM, mVereinzeln)
+      // fahre vom letzten POSE appro(pVereinzeln,trVer) --> zur neuen oberhalb, --> trApro
+      
+      movej(appro(pVereinzeln, trApro), tGreiferM, mVereinzeln)
+           
+      
+      logMsg("Objekt vereinzelt")
+      
+      // Return Value
+      bNewData = false
+      bReady = true
+        
+    
+    endIf
+    
+        
+
+    
+    
+    
+  endWhile
+  
+end]]></Code>
+  </Program>
+</Programs>
