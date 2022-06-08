@@ -13,33 +13,30 @@ IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
 
 
-def calc_angle(mu):
+def calc_angle(contour):
     """ calc angle through given moment
         Params
         --------
-         mu:   Moments of the Contour                                 
+         contour: contour of the object
 
         Returns
         --------
-         alpha: angle
+         angle: angle of the object
             
     """
+    rect = cv2.minAreaRect(contour)
+    (x,y),(w,h),angle = rect
+    box = cv2.boxPoints(rect)
+    box = np.int0(box)
 
-    x = int(mu["m10"] / mu["m00"])
-    y = int(mu["m01"] / mu["m00"])
-    center = (x,y)
-    
-    a = int(mu["m20"] - mu["m10"]*mu["m10"]/mu["m00"])
-    b = int(mu["m02"] - mu["m01"]*mu["m01"]/mu["m00"])
-    c = int(mu["m11"] - mu["m10"]*mu["m01"]/mu["m00"])
-    
-    
-    J = np.array([[a, c],[c, b]])
-    ew,ev = np.linalg.eig(J)
-    
-    alpha = np.round(atan2(ev[0,1],ev[1,1])*180/pi +360, 1)           
+    used_edge = max(w,h)
+    x_p = box[0,0] - box[1,0]
+    y_p = box[0,1] - box[1,1]
+    lenght_p = (x_p**2+y_p**2)**0.5
+    if used_edge > lenght_p+2:
+        angle = (angle+90)-180
 
-    return alpha
+    return -angle
 
 def plot_contour(img,contour):
     """ debug function to plot contours 
@@ -52,7 +49,11 @@ def plot_contour(img,contour):
         --------
     """
 
+    rect = cv2.minAreaRect(contour)
+    rect_points = cv2.boxPoints(rect)
+    rect_points = np.intp(rect_points)
     image_contour = cv2.drawContours(img,contour,-1,(0,255,0),1)
+    image_contour = cv2.drawContours(image_contour,[rect_points],0,(255,0,0))
     cv2.imshow("singel contour",image_contour)
     cv2.waitKey(0)
 
@@ -100,7 +101,7 @@ def find_objects(contours,img):
     area_lying = (700,4000)
     area_overlapping_threshold = 0.9
 
-    # get relevant contours
+    # compare min area to be valid contour
     for i in range(0, len(contours)):
         area = cv2.contourArea(contours[i])
         x,y,w,h = cv2.boundingRect(contours[i]) 
@@ -112,6 +113,7 @@ def find_objects(contours,img):
 
     # check standing or lying
     for i in range(0,len(contour)):
+        (x_min,y_min),(w_min,h_min),angle = cv2.minAreaRect(contour[i])
         x,y,w,h = cv2.boundingRect(contour[i])
         boundRect = cv2.boundingRect(contour[i])
         x2,y2,w2,h2 = cv2.boundingRect(contour[i-1])
@@ -121,8 +123,7 @@ def find_objects(contours,img):
         c = [x2,y2]
         d = [x2+w2,y2+h2]
         aoi = calc_aoi(a,b,c,d)
-
-        if area_lying[0] < area < area_lying[1]:
+        if area_lying[0] < area < area_lying[1] and not 0.4 < w_min/h_min < 2:
             obj.append(np.array([x,y,w,h]))
             orientation.append(2)
             contour_buffer.append(contour[i])
@@ -187,8 +188,23 @@ def create_mask(img, target):
         return cv2.inRange(hsv, lower, upper) 
         
     elif target == TARGET_OBJECTS:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        return cv2.inRange(gray, 130, 255)
+        # pick space in rbg color space
+        lower = np.array([0,90,100]) 
+        upper = np.array([255,255,255]) 
+        rgb = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
+        mask_rgb = cv2.inRange(rgb, lower, upper)
+
+        # remove borders overlapping
+        mask = np.zeros(mask_rgb.shape,np.uint8)
+        mask[7:-7,7:-125] = mask_rgb[7:-7,7:-125] 
+        cv2.imshow("before closing",mask)
+
+        # erosion
+        kernel_erode = np.ones((2,2),np.uint8)
+        mask = cv2.erode(mask,kernel_erode,iterations=1)
+
+        cv2.imshow("mask",mask)
+        return mask
 
 
 def homography(img):
@@ -288,11 +304,12 @@ def object_detection(img):
     mc = np.asarray(mc)   # Konvertierung in ein Array        
     mc = mc.astype(int)
     
-    # Get the orientation
-    mo = [None]*len(contour_points)
+    # Get the angle
+    angle = [None]*len(contour_points)
     for i in range(len(contour_points)):   
-        mo[i] = calc_angle(mu[i])
-    mo = np.asarray(mo)
+        angle[i] = calc_angle(contours[i])
+    angle = np.asarray(angle)
+
 
     # Get mini Pictures of each obj
     mp = [None]*len(contour_points)
@@ -306,4 +323,4 @@ def object_detection(img):
 
     # Make List of Array to 2D Array
     obj = np.vstack(obj)
-    return img_array, obj[:,0], obj[:,1], mo, orientation
+    return img_array, obj[:,0], obj[:,1], angle, orientation
