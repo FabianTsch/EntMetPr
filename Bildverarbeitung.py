@@ -124,13 +124,13 @@ def find_objects(contours,img):
         d = [x2+w2,y2+h2]
         aoi = calc_aoi(a,b,c,d)
         if area_lying[0] < area < area_lying[1] and not 0.4 < w_min/h_min < 2:
-            obj.append(np.array([x,y,w,h]))
+            obj.append(np.array([x+int(w/2),y+int(h/2),w,h]))
             orientation.append(2)
             contour_buffer.append(contour[i])
         elif aoi / area > area_overlapping_threshold:
 
             if w*h <= w2*h2:
-                obj.append(np.array([x,y,w,h]))
+                obj.append(np.array([x+int(w/2),y+int(h/2),w,h]))
                 contour_buffer.append(contour[i])
                 orientation.pop(-1)
                 obj.pop(-1)
@@ -142,7 +142,7 @@ def find_objects(contours,img):
 
             orientation.append(2)
         else:
-            obj.append(np.array([x,y,w,h]))
+            obj.append(np.array([x+int(w/2),y+int(h/2),w,h]))
             contour_buffer.append(contour[i])
             orientation.append(1)
     return obj, orientation, contour_buffer
