@@ -30,6 +30,6 @@ img_array, x, y, angle, orientation = bv.object_detection(img)
 
 obj_class = oc.execute(img_array)
 
-type, orientation, x, y, angle, error = cm.execute(obj_class,orientation, x, y, angle)
+obj_class, orientation, x, y, angle, error = cm.execute(obj_class,orientation, x, y, angle)
 
-#tcp.tcp_communication(type, orientation, x, y, angle)
+#tcp.tcp_communication(obj_class, orientation, x, y, angle)
