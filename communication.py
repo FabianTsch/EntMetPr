@@ -444,7 +444,7 @@ def move(obj_type, orientation,x, y, angle, orig, img):
             m_x -= np.cos(np.deg2rad(alpha)) * 1
             m_y -= np.sin(np.deg2rad(alpha)) * 1
            
-        return 3, 1, m_x,m_y,alpha, 0
+        return 3, 1, m_x,m_y,360-alpha, 0
 
 
     # important variables
@@ -535,6 +535,10 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     r_y = []
     r_angle = []
 
+    for i in range(0,len(angle)):
+        if angle[i] <0:
+            angle[i] = angle[i] + 360            
+    
 
     # First Part -  check pick
     j, img = checkPick(obj_type, orientation,x,y,angle,orig)
@@ -583,11 +587,11 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
         r_y = np.append(r_y, y[int(j[i])])        
         r_angle = np.append(r_angle, angle[int(j[i])])
       
-    r_type = np.append(r_type,m_type)
-    r_orientation = np.append(r_orientation, m_orientation)
-    r_x = np.append(r_x,m_x)
-    r_y = np.append(r_y,m_y)
-    r_angle = np.append(r_angle, m_angle)
+    r_type = np.append(r_type,a_type)       
+    r_orientation = np.append(r_orientation, a_orientation)
+    r_x = np.append(r_x,a_x)
+    r_y = np.append(r_y,a_y)
+    r_angle = np.append(r_angle, a_angle)
 
     return r_type, r_orientation, r_x, r_y, r_angle, error
 
