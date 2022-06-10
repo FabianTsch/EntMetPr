@@ -197,13 +197,11 @@ def create_mask(img, target):
         # remove borders overlapping
         mask = np.zeros(mask_rgb.shape,np.uint8)
         mask[7:-7,7:-125] = mask_rgb[7:-7,7:-125] 
-        cv2.imshow("before closing",mask)
 
         # erosion
         kernel_erode = np.ones((2,2),np.uint8)
         mask = cv2.erode(mask,kernel_erode,iterations=1)
 
-        cv2.imshow("mask",mask)
         return mask
 
 
