@@ -577,19 +577,19 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
         cv2.waitKey()
     # Fouth Part - Creat list
     for i in range(0,np.size(j)):
-        r_type = np.append(r_type, obj_type[int(j[i])])
-        r_orientation = np.append(r_orientation, orientation[int(j[i])])
-        r_x = np.append(r_x, x[int(j[i])])
-        r_y = np.append(r_y, y[int(j[i])])
+        r_type = np.append(r_type, obj_type[int(j[i])])        
+        r_orientation = np.append(r_orientation, orientation[int(j[i])])       
+        r_x = np.append(r_x, x[int(j[i])])       
+        r_y = np.append(r_y, y[int(j[i])])        
         r_angle = np.append(r_angle, angle[int(j[i])])
-
+      
     r_type = np.append(r_type,m_type)
     r_orientation = np.append(r_orientation, m_orientation)
     r_x = np.append(r_x,m_x)
     r_y = np.append(r_y,m_y)
     r_angle = np.append(r_angle, m_angle)
 
-    return a_type, r_orientation, a_x, a_y, a_angle, error
+    return r_type, r_orientation, r_x, r_y, r_angle, error
 
      
 
