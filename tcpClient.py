@@ -10,6 +10,9 @@ import socket
 import time
 import struct
 
+SIM = "138.232.72.123" 
+ROBOT = "192.168.0.254"
+
 def tcp_communication(type, orientation,x,y,phi):
     """Sends the Params to the Stäubli and waits for response
         can handle arrays and scalars
@@ -32,7 +35,7 @@ def tcp_communication(type, orientation,x,y,phi):
 
         # create TCP client
         # Connect the socket to the port where the server is listening
-        server_address = ('138.232.72.123', 6969)
+        server_address = (SIM, 6969)
         sock.connect(server_address)
     
     except:
