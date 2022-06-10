@@ -32,4 +32,13 @@ obj_class = oc.execute(img_array)
 
 obj_class, orientation, x, y, angle, error = cm.execute(obj_class,orientation, x, y, angle)
 
-#tcp.tcp_communication(obj_class, orientation, x, y, angle)
+
+if plot:
+    img_text = img  
+    cv2.imshow('Orginalbild', img)
+    for i in range(0,len(x)):
+        img_text = cv2.circle(img_text, (int(x[i]),int(y[i])), 3 , (0,255, 0), thickness=2)
+    cv2.imshow(' Circle', img_text)
+    cv2.waitKey()
+
+tcp.tcp_communication(obj_class, orientation, x, y, angle)
