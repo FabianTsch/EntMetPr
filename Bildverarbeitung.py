@@ -323,8 +323,4 @@ def object_detection(img):
 
     # Make List of Array to 2D Array
     obj = np.vstack(obj)
-
-    # Mirror y-achses to match userframe
-    obj[:,1] = 500-obj[:,1]
-
     return img_array, obj[:,0], obj[:,1], angle, orientation
