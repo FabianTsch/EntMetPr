@@ -9,6 +9,7 @@ from math import atan2, cos, sin, sqrt, pi
 
 TARGET_HOMOGRAPHY_POINTS = 0
 TARGET_OBJECTS = 1 
+TARGET_OBJECTS_HSV = 2
 IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
 
@@ -188,21 +189,44 @@ def create_mask(img, target):
         return cv2.inRange(hsv, lower, upper) 
         
     elif target == TARGET_OBJECTS:
+        kernel_erode = np.ones((2,2),np.uint8)
+
         # pick space in rbg color space
-        lower = np.array([0,90,100]) 
+        lower = np.array([0,85,95]) 
         upper = np.array([255,255,255]) 
         rgb = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2RGB)
-        mask_rgb = cv2.inRange(rgb, lower, upper)
-
-        # remove borders overlapping
-        mask = np.zeros(mask_rgb.shape,np.uint8)
-        mask[7:-7,7:-125] = mask_rgb[7:-7,7:-125] 
-
+        mask_obj = cv2.inRange(rgb, lower, upper)
         # erosion
-        kernel_erode = np.ones((2,2),np.uint8)
-        mask = cv2.erode(mask,kernel_erode,iterations=1)
+        mask_obj = cv2.erode(mask_obj,kernel_erode,iterations=1)
 
-        return mask
+    elif target == TARGET_OBJECTS_HSV:
+        kernel_erode = np.ones((2,2),np.uint8)
+
+        # HSV-First-Iteration
+        lower = np.array([0,0,10])
+        upper = np.array([175,100,255])
+        hsv = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2HSV)
+        mask_hsv = cv2.inRange(hsv,lower,upper)
+        mask_hsv = cv2.dilate(mask_hsv,kernel_erode,iterations=3)
+        cv2.imshow("HSV_MASK",mask_hsv)
+
+        for i in range(mask_hsv.shape[0]):
+                for j in range(mask_hsv.shape[1]): 
+                    if not mask_hsv[i,j]:
+                        img[i,j,:] = 0
+
+        # HSV-Second-Iteration
+        lower = np.array([0,0,10])
+        upper = np.array([175,100,255])
+        hsv = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2HSV)
+        mask_obj = cv2.inRange(hsv,lower,upper)
+
+    # remove borders overlapping
+    mask = np.zeros(mask_obj.shape,np.uint8)
+    mask[7:-7,7:-125] = mask_obj[7:-7,7:-125] 
+    mask_first = mask.copy()
+
+    return mask
 
 
 def homography(img):
