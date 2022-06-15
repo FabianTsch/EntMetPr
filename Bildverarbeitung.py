@@ -161,9 +161,9 @@ def crop_image(img, obj):
         image: the cut img with some overhang d
             
     """
-    d = 2                        # image overhang
-    x = int(obj[0])
-    y = int(obj[1])
+    d = 5                        # image overhang
+    x = int(obj[0])-int(obj[2]/2)
+    y = int(obj[1])-int(obj[3]/2)
     w = int(obj[2])
     h = int(obj[3])
            
