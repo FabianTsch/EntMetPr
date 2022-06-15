@@ -478,7 +478,7 @@ def move(obj_type, orientation,x, y, angle, orig, img):
         while not pick(1,2,x_m,y_m,m_alpha,img,True):  # if alpha is not poissible --> rotate alpha 
             m_alpha += 5    
             z += 5
-            print('+z')
+            #print('+z')
             if z > 360:
                 print('Error --> keine erreichbare Position gefunden')
                 error[count] = 1
@@ -592,6 +592,8 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     r_x = np.append(r_x,a_x)
     r_y = np.append(r_y,a_y)
     r_angle = np.append(r_angle, a_angle)
+    
+    r_y = 500 - r_y  # Spiegeln an der y-Achse
 
     return r_type, r_orientation, r_x, r_y, r_angle, error
 

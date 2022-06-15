@@ -183,7 +183,7 @@ def create_mask(img, target):
             
     """
     if target == TARGET_HOMOGRAPHY_POINTS:
-        lower = np.array([40,80,80]) 
+        lower = np.array([40,60,60]) 
         upper = np.array([86,230,230]) 
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         return cv2.inRange(hsv, lower, upper) 
@@ -241,6 +241,8 @@ def homography(img):
             
     """
     mask = create_mask(img,target=TARGET_HOMOGRAPHY_POINTS)
+    cv2.imshow('Maske', mask)
+    cv2.waitKey()
 
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
             
