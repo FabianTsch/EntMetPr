@@ -443,6 +443,9 @@ def move(obj_type, orientation,x, y, angle, orig, img):
         while not pick(1,2,x,y,alpha[0],img,True):           
             m_x -= np.cos(np.deg2rad(alpha)) * 1
             m_y -= np.sin(np.deg2rad(alpha)) * 1
+        
+        m_x -= np.cos(np.deg2rad(alpha)) * 30
+        m_y -= np.sin(np.deg2rad(alpha)) * 30
            
         return 3, 1, m_x,m_y,360-alpha, 0
 
@@ -488,6 +491,9 @@ def move(obj_type, orientation,x, y, angle, orig, img):
         while pick(1,2,x_m,y_m,m_alpha,img,True):
             x_m -= np.cos(np.deg2rad(m_alpha)) * 1
             y_m -= np.sin(np.deg2rad(m_alpha)) * 1
+
+        x_m += np.cos(np.deg2rad(m_alpha)) * 20
+        y_m += np.sin(np.deg2rad(m_alpha)) * 20
             
         if m_alpha <0:
             m_alpha = abs(m_alpha)+180

@@ -53,7 +53,8 @@ def tcp_communication(type, orientation,x,y,phi):
             print('waiting for ready signal...')
             time.sleep(0.5)
         print('Robot is ready')
-        
+    data=struct.pack('ddddd',10,0,150 ,150,0)
+    sock.sendall(data)
     print('Done!')
 
     return 0
