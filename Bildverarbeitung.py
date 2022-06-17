@@ -208,7 +208,6 @@ def create_mask(img, target):
         hsv = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2HSV)
         mask_hsv = cv2.inRange(hsv,lower,upper)
         mask_hsv = cv2.dilate(mask_hsv,kernel_erode,iterations=3)
-        cv2.imshow("HSV_MASK",mask_hsv)
 
         for i in range(mask_hsv.shape[0]):
                 for j in range(mask_hsv.shape[1]): 
@@ -241,9 +240,6 @@ def homography(img):
             
     """
     mask = create_mask(img,target=TARGET_HOMOGRAPHY_POINTS)
-    cv2.imshow('Maske', mask)
-    cv2.waitKey()
-
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
             
     # Counturs Filtern 
