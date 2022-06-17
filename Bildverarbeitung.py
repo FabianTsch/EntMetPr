@@ -146,10 +146,17 @@ def find_objects(contours,img):
             obj.append(np.array([x+int(w/2),y+int(h/2),w,h]))
             contour_buffer.append(contour[i])
             orientation.append(1)
-    return obj, orientation, contour_buffer
+
+    # calculate angle
+    angle = [None]*len(contour_buffer)
+    for i in range(len(contour_buffer)):   
+        angle[i] = calc_angle(contour_buffer[i])
+    angle = np.asarray(angle)
+
+    return obj, orientation, contour_buffer, angle
 
 
-def crop_image(img, obj):
+def crop_image(img, obj_array : list):
     """ Cut the given img around the given objectsize and the center of mass with some overhang
         Params
         --------
@@ -161,14 +168,17 @@ def crop_image(img, obj):
         image: the cut img with some overhang d
             
     """
-    d = 5                        # image overhang
-    x = int(obj[0])-int(obj[2]/2)
-    y = int(obj[1])-int(obj[3]/2)
-    w = int(obj[2])
-    h = int(obj[3])
-           
-    image = img[(y-d):(y+h+d), (x-d):(x+w+d)]
-    return image
+    image_array = []
+    for obj in obj_array:
+        d = 5                        # image overhang
+        x = int(obj[0])-int(obj[2]/2)
+        y = int(obj[1])-int(obj[3]/2)
+        w = int(obj[2])
+        h = int(obj[3])
+               
+        image = img[(y-d):(y+h+d), (x-d):(x+w+d)]
+        image_array.append(image)
+    return image_array
 
 def create_mask(img, target):
     """ creats a opencv mask of a img depending on the given target
@@ -227,6 +237,36 @@ def create_mask(img, target):
 
     return mask
 
+def calc_moments(contours,contour_points):
+    mu = [None]*len(contour_points)
+    for i in range(len(contour_points)):            
+        mu[i] = cv2.moments(contours[contour_points[i]])
+
+    return mu
+
+def calc_mass_center(contour_points,moments):
+    mc = [None]*len(contour_points)
+    for i in range(len(contour_points)):           
+        # add 1e-5 to avoid division by zero
+        mc[i] = (moments[i]['m10'] / (moments[i]['m00'] + 1e-5), moments[i]['m01'] / (moments[i]['m00'] + 1e-5))        
+    mc = np.asarray(mc)   # Konvertierung in ein Array        
+    mc = mc.astype(int)
+
+    return mc
+
+def sort_mass_center_points(mc):
+    mc = mc[mc[:,1].argsort()]        
+    if mc[0,0] < mc[1,0]:            
+        temp = np.copy(mc[0,:])
+        mc[0,:] = mc[1,:]
+        mc[1,:] = temp
+
+    if mc[2,0] > mc[3,0]:             
+          temp = np.copy(mc[2,:])
+          mc[2,:] = mc[3,:]
+          mc[3,:] = temp
+
+    return mc
 
 def homography(img):
     """ searches for source points and executes homography
@@ -253,30 +293,14 @@ def homography(img):
     contour_points = contour_points[0:len(contour_points)]  
     contour_points = contour_points.astype(int)
 
-    # Get the moments
-    mu = [None]*len(contour_points)
-    for i in range(len(contour_points)):            
-        mu[i] = cv2.moments(contours[contour_points[i]])
+    # Get Moments 
+    mu = calc_moments(contours,contour_points)
 
     # Get the mass centers
-    mc = [None]*len(contour_points)
-    for i in range(len(contour_points)):           
-        # add 1e-5 to avoid division by zero
-        mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))        
-    mc = np.asarray(mc)   # Konvertierung in ein Array        
-    mc = mc.astype(int)
+    mc = calc_mass_center(contour_points,mu)
 
     # sort the mass center points                    
-    mc = mc[mc[:,1].argsort()]        
-    if mc[0,0] < mc[1,0]:            
-        temp = np.copy(mc[0,:])
-        mc[0,:] = mc[1,:]
-        mc[1,:] = temp
-
-    if mc[2,0] > mc[3,0]:             
-          temp = np.copy(mc[2,:])
-          mc[2,:] = mc[3,:]
-          mc[3,:] = temp
+    mc = sort_mass_center_points(mc)
     
     # Points in destination image        
     points_dst = np.array([ [IMAGE_WIDTH, 0], [0, 0],[0, IMAGE_HIGHT],[IMAGE_WIDTH, IMAGE_HIGHT] ])
@@ -284,6 +308,7 @@ def homography(img):
     # Homography
     h, status = cv2.findHomography(mc, points_dst)          
     image = cv2.warpPerspective(img, h, (IMAGE_WIDTH,IMAGE_HIGHT))
+
     return image
 
 
@@ -308,33 +333,14 @@ def object_detection(img):
     # contour filter
     contour_points = np.array([], dtype=int)
     obj = []
-    obj, orientation, contours = find_objects(contours,img)
+    obj, orientation, contours, angle = find_objects(contours,img)
     contour_points = range(0,len(contours))
 
-    # Get the moments
-    mu = [None]*len(contour_points)
-    for i in range(len(contour_points)):            
-        mu[i] = cv2.moments(contours[contour_points[i]])
-
-    # Get the mass centers
-    mc = [None]*len(contour_points)
-    for i in range(len(contour_points)):           
-        # add 1e-5 to avoid division by zero
-        mc[i] = (mu[i]['m10'] / (mu[i]['m00'] + 1e-5), mu[i]['m01'] / (mu[i]['m00'] + 1e-5))        
-    mc = np.asarray(mc)   # Konvertierung in ein Array        
-    mc = mc.astype(int)
-    
-    # Get the angle
-    angle = [None]*len(contour_points)
-    for i in range(len(contour_points)):   
-        angle[i] = calc_angle(contours[i])
-    angle = np.asarray(angle)
-
+    # Get Moments 
+    mu = calc_moments(contours,contour_points)
 
     # Get mini Pictures of each obj
-    mp = [None]*len(contour_points)
-    for i in range(len(contour_points)):
-        mp[i] = crop_image(img, obj[i])
+    mp = crop_image(img,obj)
 
     # change color BGR to RGB
     img_array = [None]*len(mp)
