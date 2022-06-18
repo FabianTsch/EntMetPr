@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="TCPserver">
+    <Locals>
+      <Local name="l_nStatus" type="num" xsi:type="array" size="1" />
+      <Local name="l_nBytesIn" type="num" xsi:type="array" size="40" />
+      <Local name="l_nSuccBytes" type="num" xsi:type="array" size="1" />
+      <Local name="p_point" type="pointRx" xsi:type="array" size="1" />
+      <Local name="erreichbar" type="bool" xsi:type="array" size="1" />
+      <Local name="error" type="bool" xsi:type="array" size="1" />
+    </Locals>
+    <Code><![CDATA[begin
+  // l_nBytesIn: 64 bit -> 8 byte
+  // nData: 8 
+  
+  
+  
+  while true
+    logMsg("Schleife start")
+    l_nStatus=sioGet(soTcpClient, l_nBytesIn)    
+    if l_nStatus>0
+      // Write recieved bytes in data
+      // Achtung bei mehr Bitlänge 24, 3 und globale Variable(nData) ändern
+      
+      if(fromBinary(l_nBytesIn,40,"8.0l",nData)!=5)  
+        logMsg("Empfangene Daten sind fehlerhaft",2)
+        
+      else
+               
+                  
+        logMsg("Daten über TCP/IP empfangen")
+        // check if data is in limits
+        // ...
+        nObj = limit(nData[0],1,10)
+        nOrientation = limit(nData[1],1,2)
+        nX = limit(nData[2],1,750)
+        nY = limit(nData[3],1,500)
+        nAngle = nData[4]
+                     
+                     
+        // check if the Point is reachable
+        error = false
+        pEmpty.trsf.x = nX
+        pEmpty.trsf.y = nY
+        pEmpty.trsf.z = 10
+        pEmpty.trsf.rz = nAngle
+        //  
+        if nData[0] == 3
+          while !pointToJoint(tGreiferM,jHome,pEmpty,jEmpty)
+            pEmpty.trsf.rz = pEmpty.trsf.rz + 5
+            nAngle = pEmpty.trsf.rz                         
+          endWhile
+        endIf
+                              
+        if !pointToJoint(tGreiferM,jHome,pEmpty,jEmpty) 
+          pEmpty.trsf.rz = nAngle + 180 
+            
+             
+          if pointToJoint(tGreiferM,jHome,pEmpty,jEmpty)
+            nAngle = nAngle + 180           
+            // logMsg("Punkt wird verändert")
+          else
+            // logMsg("Punkt nicht erreichbar")       
+                
+            error = true
+          endIf
+              
+        endIf
+                 
+        if error == false        
+             
+          // if Vereinzeln ist True
+          if nData[0] == 10                   
+            movej(jHome,tGreiferM,mUsedSpeed)   
+            bPick = false
+            bVereinzeln = false
+                     
+        elseIf nData[0]==3            
+                       
+            bPick = false
+            bVereinzeln = true           
+          elseIf nData[0] == 1 or nData[0] == 2
+            bPick = true
+            bVereinzeln = false
+          endIf
+            
+          bReady = false
+          bNewData = true  
+            
+        else
+          bReady = true
+          logMsg(" ****************** Punkt ist nicht erreichbar!!")
+          // Fehlerabfrage
+
+        endIf
+        // Ende Abfragung ob er korrekte Daten erhalten hat
+      endIf
+      
+      
+              
+      // tell client that robot is ready
+      wait(bReady)
+      
+      //delay(2)
+      l_nStatus=sioSet(soTcpClient, 1) 
+    
+    
+     
+    endIf
+  endWhile  
+end
+]]></Code>
+  </Program>
+</Programs>

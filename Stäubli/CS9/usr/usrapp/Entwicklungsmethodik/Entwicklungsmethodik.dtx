@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Database xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Data/2">
+  <Datas>
+    <Data name="mNomSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
+    <Data name="fUserFrame" access="private" xsi:type="array" type="frame" size="1">
+      <Value key="0" x="1007.262395" y="-312.843264" z="-186.866453" rx="-0.535332" ry="-0.21904" rz="90.124968" fatherId="world[0]" />
+    </Data>
+    <Data name="soTcpClient" access="private" xsi:type="array" type="sio" size="1">
+      <Value key="0" link="Socket\server0" />
+    </Data>
+    <Data name="jHome" access="private" xsi:type="array" type="jointRx" size="1">
+      <Value key="0" j3="90" j5="90" />
+    </Data>
+    <Data name="bNewData" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="nData" access="private" xsi:type="array" type="num" size="5" />
+    <Data name="bReady" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="tGreiferM" access="private" xsi:type="array" type="tool" size="1">
+      <Value key="0" y="-27" z="127" rx="45" fatherId="flange[0]" ioLink="ValveIO\valve1" ioOpen="0.05" ioClose="0.05" />
+    </Data>
+    <Data name="tGreiferS" access="private" xsi:type="array" type="tool" size="1">
+      <Value key="0" y="27" z="127" rx="-45" ry="5.50371872946114E-07" rz="179.999999432294" fatherId="flange[0]" ioLink="ValveIO\valve1" ioOpen="0.05" ioClose="0.05" />
+    </Data>
+    <Data name="bVereinzeln" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="bPick" access="private" xsi:type="array" type="bool" size="1" />
+    <Data name="trApro" access="private" xsi:type="array" type="trsf" size="1">
+      <Value key="0" z="-150" />
+    </Data>
+    <Data name="pPick" access="private" xsi:type="array" type="pointRx" size="4">
+      <Value key="0" z="6" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="1" z="20" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="2" z="6" rx="180" rz="45" fatherId="fUserFrame[0]" />
+      <Value key="3" z="10" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="mUsedSpeed" access="private" xsi:type="array" type="mdesc" size="1" />
+    <Data name="pPlace" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" z="70" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="nObj" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nOrientation" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nX" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nY" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nAngle" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="pVereinzeln" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" z="10" rx="180" rz="45" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="trVer" access="private" xsi:type="array" type="trsf" size="1">
+      <Value key="0" x="100" />
+    </Data>
+    <Data name="mVereinzeln" access="private" xsi:type="array" type="mdesc" size="1">
+      <Value key="0" accel="10" leave="1" reach="1" />
+    </Data>
+    <Data name="nX_S" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nX_M" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nY_M" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="nY_S" access="private" xsi:type="array" type="num" size="1" />
+    <Data name="delta_Y" access="private" xsi:type="array" type="dio" size="1" />
+    <Data name="delta_X" access="private" xsi:type="array" type="dio" size="1" />
+    <Data name="pEmpty" access="private" xsi:type="array" type="pointRx" size="1">
+      <Value key="0" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="jEmpty" access="private" xsi:type="array" type="jointRx" size="1" />
+    <Data name="pObj" access="private" xsi:type="array" type="pointRx" size="10">
+      <Value key="0" x="345" y="445" rz="350" fatherId="fUserFrame[0]" />
+      <Value key="1" x="256" y="423" rz="348" fatherId="fUserFrame[0]" />
+      <Value key="2" x="144" y="415" rz="354" fatherId="fUserFrame[0]" />
+      <Value key="3" x="71" y="410" rz="323" fatherId="fUserFrame[0]" />
+      <Value key="4" x="449" y="370" rz="224" fatherId="fUserFrame[0]" />
+      <Value key="5" x="163" y="356" rz="335" fatherId="fUserFrame[0]" />
+      <Value key="6" x="347" y="337" rz="182" fatherId="fUserFrame[0]" />
+      <Value key="7" x="84" y="333" rz="333" fatherId="fUserFrame[0]" />
+      <Value key="8" x="263" y="246" rz="523" fatherId="fUserFrame[0]" />
+      <Value key="9" x="406" y="235" rz="511" fatherId="fUserFrame[0]" />
+    </Data>
+    <Data name="pAblegen" access="private" xsi:type="array" type="pointRx" size="2">
+      <Value key="0" x="700" y="125" fatherId="fUserFrame[0]" />
+      <Value key="1" x="700" y="375" fatherId="fUserFrame[0]" />
+    </Data>
+  </Datas>
+</Database>

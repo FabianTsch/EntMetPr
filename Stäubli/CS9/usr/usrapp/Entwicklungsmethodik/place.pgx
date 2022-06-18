@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Programs xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.staubli.com/robotics/VAL3/Program/2">
+  <Program name="place">
+    <Parameters xmlns="http://www.staubli.com/robotics/VAL3/Param/1">
+      <Parameter name="x_nX" type="num" xsi:type="element" />
+      <Parameter name="x_nY" type="num" xsi:type="element" />
+      <Parameter name="tGreifer" type="tool" xsi:type="element" />
+    </Parameters>
+    <Code><![CDATA[begin
+  // x,y [mm]   
+
+  
+  pPlace.trsf.x = x_nX
+  pPlace.trsf.y = x_nY
+  
+  
+  
+  movej(appro(pPlace,trApro),tGreifer, mUsedSpeed)
+  movel(pPlace, tGreifer, mUsedSpeed)
+  open(tGreifer)
+  movel(appro(pPlace, trApro), tGreifer, mUsedSpeed)
+  //logMsg("Objekt abgelegt") 
+  
+
+  
+  
+  
+end]]></Code>
+  </Program>
+</Programs>

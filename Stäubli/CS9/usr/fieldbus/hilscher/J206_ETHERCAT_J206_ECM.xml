@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SYCONnet>
+  <ProjectPath>.</ProjectPath>
+  <ProjectFile>ETHERCAT_J206_ECM.spj</ProjectFile>
+  <Target UID="Item1" Protocol="ETHERCAT" ModuleName="J206 ECM" DtmProgID="Staubli.ECATMasterDTM.1" PathToExportedFiles="..\..\configs\J206_EtherCAT" BaseNameForExportedFiles="J206_SyCon" />
+</SYCONnet>
