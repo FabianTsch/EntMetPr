@@ -541,6 +541,10 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     j, img = checkPick(obj_type, orientation,x,y,angle,orig)
 
     if debug:
+        offset = 0
+        if plot:
+            offset = 100
+
         img_text = createImg(obj_type, orientation,x,y,angle, [750,500])
         img_text = img_text.astype(np.float32)*255    
         img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
@@ -548,7 +552,7 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
         font = cv2.FONT_HERSHEY_SIMPLEX
         for i in j:
             i = int(i)
-            cv2.putText(img_text, str(i),(x[i],y[i]), font,
+            cv2.putText(img_text, str(i),(x[i]+offset,y[i]+offset), font,
                             1, (0, 0, 255), 2)
         cv2.imshow('alle Objekte', img_text)
 
@@ -560,6 +564,12 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     a_type, a_orientation, a_x, a_y, a_angle, error = move(m_type, m_orientation,m_x.copy(), m_y.copy(), m_angle.copy(), orig, img)
    
     if debug:
+        if debug:
+            a_x += 100
+            a_y += 100
+            m_x += 100
+            m_y += 100
+
         img_text =  img        
         img_text = img_text.astype(np.float32)*255    
         img_text = cv2.cvtColor(img_text, cv2.COLOR_GRAY2RGB)
