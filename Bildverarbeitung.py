@@ -336,9 +336,6 @@ def object_detection(img):
     obj, orientation, contours, angle = find_objects(contours,img)
     contour_points = range(0,len(contours))
 
-    # Get Moments 
-    mu = calc_moments(contours,contour_points)
-
     # Get mini Pictures of each obj
     mp = crop_image(img,obj)
 
