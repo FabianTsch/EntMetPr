@@ -11,7 +11,7 @@ Communication: Filters the array of object checks for collisions
 import cv2
 import numpy as np
 
-plot = False
+plot = True
 debug = True
 
 
@@ -67,7 +67,7 @@ def createObj(obj_type, orientation,x,y,angle, orig, tool=False,move=False, work
     
     if move:       
         width = 42+s
-        height = 20+s
+        height = 25+s
 
     obj = np.ones((height,width))
     if tool and not move:
@@ -80,14 +80,10 @@ def createObj(obj_type, orientation,x,y,angle, orig, tool=False,move=False, work
 
     M = np.float32([[1,0,int((w-width)/2)],[0,1,int((w-height)/2)]])            # translation to the new center
     obj = cv2.warpAffine(obj, M, (w, w))
-    if plot:
-        cv2.imshow('Körper verschoben', obj)
-      
+
     rows,cols = obj.shape
     M = cv2.getRotationMatrix2D((w/2,w/2), angle, 1)
     obj = cv2.warpAffine(obj, M, (w, w))
-    if plot:
-        cv2.imshow('Körper gedreht', obj)
     
 
     # Draw the obj in the work space 
@@ -170,13 +166,11 @@ def pick(obj_type, orientation,x,y,angle,img,move=False, workspace=100):
 
     if plot:
         img_bitwise_and = img_bitwise_and[(workspace+1):y_img+workspace, (workspace+1):x_img+workspace]  # shrinks the image to the area of ​​interest
-        #cv2.imshow('bitwise_and', img_bitwise_and)
-        #cv2.waitKey()
         if img_bitwise_and.any():
              possible = False
         else:
             possible = True
-        print(' ISt das Objekt audgreifbar?', possible)
+        
 
     return possible
 
@@ -216,23 +210,17 @@ def checkPick(obj_type, orientation,x,y,angle,orig, img = 0):
     
     else:
         for count in range(0,np.size(obj_type)):  # do the check as often as there are elements in obj  
-            if plot:
-                print ('#################  Durlauf Nr.: ', count)            
+            # if plot:
+            #     print ('#################  Durlauf Nr.: ', count)            
 
             for i in range(0,np.size(obj_type)):  # first loop over all objects  
                 if count%2 == 0:
-                    i = np.size(obj_type)-i -1
-                
-                if plot:
-                    print('Der Sublauf: ', i)   
-                    print('##### j ist: ', j)          
+                    i = np.size(obj_type)-i -1                
+      
                 if not i in j and pick(obj_type[i], orientation[i],x[i],y[i],angle[i],img):   # Controls if any i ist part of j and if obj[i] is pickable            
                                    
                     j = np.append(j,i)   
-                    img -=createImg(obj_type[i], orientation[i],x[i],y[i],angle[i],orig) # subtracts the object from the image  
-                    if plot:                                             
-                        cv2.imshow(str(i), img)  
-                        cv2.waitKey()            
+                    img -=createImg(obj_type[i], orientation[i],x[i],y[i],angle[i],orig) # subtracts the object from the image       
                     
             
     
@@ -328,10 +316,8 @@ def createSubGroup(obj_type, orientation,x,y,angle, area=0):
                 g_angle = np.append(g_angle,np.abs((angle[j]*surface[j]+angle[i]*surface[i])/(surface[j]+surface[i])))
                 g_area = np.append(g_area,surface[j]+surface[i] )            
                 g_type[i] = 3 
-                g_type[j] = 3 
-                
-                if plot:
-                    print('Objekt erstellen')
+                g_type[j] = 3                 
+
             elif  not i  in g_j and not j in g_j:    
                 g_j = np.append(g_j,i)
 
@@ -399,17 +385,13 @@ def createGroup(obj_type, orientation,x,y,angle,j):
     # other loops
     if not np.size(m_x)==1:
         for i in range(0,np.size(obj_type)):
-            if plot:
-                print('####################### Runde :', i)
+            # if plot:
+            #     print('####################### Runde :', i)
             m_x, m_y, m_angle, m_area = createSubGroup(m_type,m_orientation,m_x,m_y,m_angle,m_area)
         
      
     
     m_orientation = np.ones(np.size(m_x)) *2    # Orientation chanced to lying
-    
-    if plot:
-        print('Area:', m_area)
-        print('Ende Fkt')
     
     return m_type, m_orientation, m_x, m_y, m_angle
  
@@ -444,14 +426,13 @@ def move(obj_type, orientation,x, y, angle, orig, img):
             m_x -= np.cos(np.deg2rad(alpha)) * 1
             m_y -= np.sin(np.deg2rad(alpha)) * 1
         
-        m_x -= np.cos(np.deg2rad(alpha)) * 30
-        m_y -= np.sin(np.deg2rad(alpha)) * 30
+        m_x -= np.cos(np.deg2rad(alpha)) * 10
+        m_y -= np.sin(np.deg2rad(alpha)) * 10
            
         return 3, 1, m_x,m_y,360-alpha, 0
 
 
-    # important variables
-    threshold = np.inf
+    # important variables    
     alpha = np.zeros(np.size(x))
     error = np.zeros(np.size(x))
     m_x = np.zeros(np.size(x))
@@ -461,45 +442,55 @@ def move(obj_type, orientation,x, y, angle, orig, img):
     for count in range (0,np.size(x)):        
         r = 0
         z = 0
+        threshold = np.inf
         # first step, check for the nearest group
         for i in range(0,np.size(x)):
             if not count == i:    
                 r = ((x[count]-x[i])**2+(y[count]-y[i])**2)**0.5             
-                if r < threshold:
+                if r <= threshold:
+                    threshold = r + 0
                     j = i   # nearest group
         
         # second step search for the ideal attack vector
         # creat the vektor between the two Groups
         m_alpha = np.arctan2((y[j]-y[count]),(x[j]-x[count]))  
-        if plot:
-            print('m_alpha: ',m_alpha)
+
 
         # check if this position is reachable      
         x_m = r*np.cos(m_alpha)/2 + x[count]
         y_m = r*np.sin(m_alpha)/2 + y[count] 
         m_alpha = m_alpha*180/np.pi
         while not pick(1,2,x_m,y_m,m_alpha,img,True):  # if alpha is not poissible --> rotate alpha 
-            m_alpha += 5    
+            m_alpha += 5  
             z += 5
             #print('+z')
-            if z > 360:
-                print('Error --> keine erreichbare Position gefunden')
+            if z > 450:
+                x_m += np.cos(np.deg2rad(m_alpha)) * 10
+                y_m += np.sin(np.deg2rad(m_alpha)) * 10
+                i = 0
+                
+                print('Error --> keine erreichbare Position gefunden, Radius wird vergrößert')
                 error[count] = 1
-                break 
+                #break 
         
         # find the distance to the obj make steps of 1 mm
         while pick(1,2,x_m,y_m,m_alpha,img,True):
             x_m -= np.cos(np.deg2rad(m_alpha)) * 1
             y_m -= np.sin(np.deg2rad(m_alpha)) * 1
 
-        x_m += np.cos(np.deg2rad(m_alpha)) * 20
-        y_m += np.sin(np.deg2rad(m_alpha)) * 20
-            
+        x_m += np.cos(np.deg2rad(m_alpha)) * 10
+        y_m += np.sin(np.deg2rad(m_alpha)) * 10
+
+        
+        if m_alpha > 360:
+            m_alpha -= 360 * (m_alpha//360)
+           
+
         if m_alpha <0:
             m_alpha = abs(m_alpha)+180
-        else:
+        elif m_alpha<180:
             m_alpha = 180-m_alpha
-
+       
 
         alpha[count] = m_alpha
         m_x[count] = int(x_m)
@@ -561,10 +552,7 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
                             1, (0, 0, 255), 2)
         cv2.imshow('alle Objekte', img_text)
 
-    if plot:
-        cv2.imshow('alle Gruppen', img)
-        cv2.waitKey()
-        
+
     # Second Part -  Creat Groups
     m_type, m_orientation, m_x, m_y, m_angle = createGroup(obj_type, orientation,x,y,angle,j)
         
@@ -642,9 +630,9 @@ def test():
         i = int(i)
         img += createImg(obj_type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig )
         img_tool += createImg(obj_type[i], orientation[i],x_obj[i],y_obj[i],angle[i], orig, True )    
-    cv2.imshow('alle Objekt welche aufgegriffen werden', img+img_tool)
 
-    cv2.waitKey()
+
+   
 
     # %%
     # Second Part  --> Creat Groups
