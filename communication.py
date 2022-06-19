@@ -11,7 +11,7 @@ Communication: Filters the array of object checks for collisions
 import cv2
 import numpy as np
 
-plot = True
+plot = False
 debug = True
 
 
@@ -564,11 +564,9 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
     a_type, a_orientation, a_x, a_y, a_angle, error = move(m_type, m_orientation,m_x.copy(), m_y.copy(), m_angle.copy(), orig, img)
    
     if debug:
-        if debug:
-            a_x += 100
-            a_y += 100
-            m_x += 100
-            m_y += 100
+        offset = 0
+        if plot:
+            offset = 100   
 
         img_text =  img        
         img_text = img_text.astype(np.float32)*255    
@@ -576,10 +574,10 @@ def execute(obj_type, orientation,x,y,angle, orig=[750,500]):
         font = cv2.FONT_HERSHEY_SIMPLEX
         for i in range(0,np.size(m_x)):
             i = int(i)   
-            img_text = cv2.line(img_text, (int(a_x[i]),int(a_y[i])), (int(m_x[i]), int(m_y[i])), (0,255, 0), thickness=2)     
-            cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]),int(a_y[i])), font, 0.5, (0, 255, 0), 2)                      
+            img_text = cv2.line(img_text, (int(a_x[i]+offset),int(a_y[i]+offset)), (int(m_x[i]+offset), int(m_y[i]+offset)), (0,255, 0), thickness=2)     
+            cv2.putText(img_text, str(int(a_angle[i])),(int(a_x[i]+offset),int(a_y[i]+offset)), font, 0.5, (0, 255, 0), 2)                      
                 
-            cv2.putText(img_text, str(i),(int(m_x[i]),int(m_y[i])), font,1, (0, 0, 255), 2)
+            cv2.putText(img_text, str(i),(int(m_x[i]+offset),int(m_y[i]+offset)), font,1, (0, 0, 255), 2)
                 
         cv2.imshow('Gruppen', img_text)
         cv2.waitKey()
