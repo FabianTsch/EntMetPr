@@ -2,7 +2,7 @@ import matplotlib as plt
 import numpy as np
 from math import pi
 from email.headerregistry import AddressHeader
-from trackbar import live_seperation
+from trackbar import live_seperation, live_seperation_homo
 
 # Open CV
 import cv2
@@ -14,6 +14,7 @@ TARGET_OBJECTS_HSV = 2
 IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
 live = True
+live_homography = True
 
 
 def calc_angle(contour):
@@ -195,8 +196,12 @@ def create_mask(img, target):
             
     """
     if target == TARGET_HOMOGRAPHY_POINTS:
-        lower = np.array([40,60,60]) 
-        upper = np.array([86,230,230]) 
+        if live_homography:
+            lower, upper = live_seperation_homo(img) 
+        else:
+            lower = np.array([40,60,60]) 
+            upper = np.array([86,230,230]) 
+
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         return cv2.inRange(hsv, lower, upper) 
         
