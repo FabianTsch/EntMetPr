@@ -2,6 +2,7 @@ import matplotlib as plt
 import numpy as np
 from math import pi
 from email.headerregistry import AddressHeader
+from trackbar import live_seperation
 
 # Open CV
 import cv2
@@ -12,6 +13,7 @@ TARGET_OBJECTS = 1
 TARGET_OBJECTS_HSV = 2
 IMAGE_WIDTH = 750
 IMAGE_HIGHT = 500
+live = True
 
 
 def calc_angle(contour):
@@ -210,23 +212,13 @@ def create_mask(img, target):
         mask_obj = cv2.erode(mask_obj,kernel_erode,iterations=1)
 
     elif target == TARGET_OBJECTS_HSV:
-        kernel_erode = np.ones((2,2),np.uint8)
-
-        # HSV-First-Iteration
-        lower = np.array([0,0,10])
-        upper = np.array([175,100,255])
-        hsv = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2HSV)
-        mask_hsv = cv2.inRange(hsv,lower,upper)
-        mask_hsv = cv2.dilate(mask_hsv,kernel_erode,iterations=3)
-
-        for i in range(mask_hsv.shape[0]):
-                for j in range(mask_hsv.shape[1]): 
-                    if not mask_hsv[i,j]:
-                        img[i,j,:] = 0
+        if live:
+            lower, upper = live_seperation(img)
+        else:
+            lower = np.array([0,0,10])
+            upper = np.array([175,100,255])
 
         # HSV-Second-Iteration
-        lower = np.array([0,0,10])
-        upper = np.array([175,100,255])
         hsv = cv2.cvtColor(img.copy(), cv2.COLOR_BGR2HSV)
         mask_obj = cv2.inRange(hsv,lower,upper)
 
@@ -327,7 +319,7 @@ def object_detection(img):
          orientation: standing or lying
             
     """
-    mask = create_mask(img,target=TARGET_OBJECTS)
+    mask = create_mask(img,target=TARGET_OBJECTS_HSV)
     contours, hierarchy = cv2.findContours(mask,cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)
 
     # contour filter
