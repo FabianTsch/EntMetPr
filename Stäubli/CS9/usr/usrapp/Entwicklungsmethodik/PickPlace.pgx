@@ -75,9 +75,9 @@
           
           nX_S = nX_S + 40
           
-          if nX_S > 730
+          if nX_S > 700
             nX_S = 650
-            nY_S = nY_S + 70
+            nY_S = nY_S + 50
           endIf
           
           if nY_S > 560

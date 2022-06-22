@@ -3,39 +3,15 @@
   <Controller Name="CS9">
     <Application>Disk://Entwicklungsmethodik/Entwicklungsmethodik.pjx</Application>
   </Controller>
-  <Option Name="DataTreeView">
-    <Nodes>
-      <Node Path="Endabgabe_V1" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\frame" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\frame\fUserFrame" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\mdesc" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\pointRx" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\trsf\trApro" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\trsf\trVer" IsExpanded="true" />
-    </Nodes>
-  </Option>
+  <Option Name="DataTreeView" />
   <Option Name="CellExplorer">
     <Nodes>
-      <Node Path="Endabgabe_V1" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\Vereinzeln" IsExpanded="true" />
+      <Node Path="Endabgabe_V10" IsExpanded="true" />
+      <Node Path="Endabgabe_V10\CS9" IsExpanded="true" />
+      <Node Path="Endabgabe_V10\CS9\Entwicklungsmethodik" IsExpanded="true" />
     </Nodes>
   </Option>
-  <Option Name="GeometryView">
-    <Nodes>
-      <Node Path="Endabgabe_V1" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\world[0]" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\world[0]\fUserFrame" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\world[0]\fUserFrame\fUserFrame[0]" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\world[0]\fUserFrame\fUserFrame[0]\pObj" IsExpanded="true" />
-      <Node Path="Endabgabe_V1\CS9\Entwicklungsmethodik\world[0]\fUserFrame\fUserFrame[0]\pAblegen" IsExpanded="true" />
-    </Nodes>
-  </Option>
+  <Option Name="GeometryView" />
   <Option Name="Breakpoints">
     <Breakpoints />
   </Option>

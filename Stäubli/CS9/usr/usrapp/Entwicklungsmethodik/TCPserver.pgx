@@ -71,7 +71,11 @@
              
           // if Vereinzeln ist True
           if nData[0] == 10                   
-            movej(jHome,tGreiferM,mUsedSpeed)   
+            movej(jHome,tGreiferM,mUsedSpeed)
+            waitEndMove()
+            open(tGreiferM)
+            open(tGreiferS)
+            
             bPick = false
             bVereinzeln = false
                      
