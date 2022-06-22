@@ -51,7 +51,7 @@ def createObj(obj_type, orientation,x,y,angle, orig, tool=False,move=False, work
     if tool:
         if obj_type == 1 and orientation == 2:  # tool for screw 
             width = 42+s
-            height = 20+s
+            height = 25+s
            
                         
         else:   # tool for nuts
@@ -67,7 +67,7 @@ def createObj(obj_type, orientation,x,y,angle, orig, tool=False,move=False, work
     
     if move:       
         width = 42+s
-        height = 25+s
+        height = 30+s
 
     obj = np.ones((height,width))
     if tool and not move:
@@ -426,8 +426,8 @@ def move(obj_type, orientation,x, y, angle, orig, img):
             m_x -= np.cos(np.deg2rad(alpha)) * 1
             m_y -= np.sin(np.deg2rad(alpha)) * 1
         
-        m_x -= np.cos(np.deg2rad(alpha)) * 10
-        m_y -= np.sin(np.deg2rad(alpha)) * 10
+        m_x -= np.cos(np.deg2rad(alpha)) * 15
+        m_y -= np.sin(np.deg2rad(alpha)) * 15
            
         return 3, 1, m_x,m_y,360-alpha, 0
 
@@ -478,8 +478,8 @@ def move(obj_type, orientation,x, y, angle, orig, img):
             x_m -= np.cos(np.deg2rad(m_alpha)) * 1
             y_m -= np.sin(np.deg2rad(m_alpha)) * 1
 
-        x_m += np.cos(np.deg2rad(m_alpha)) * 10
-        y_m += np.sin(np.deg2rad(m_alpha)) * 10
+        x_m += np.cos(np.deg2rad(m_alpha)) * 15
+        y_m += np.sin(np.deg2rad(m_alpha)) * 15
 
         
         if m_alpha > 360:
